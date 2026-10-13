@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7fbfc">
+  <title>MediGuide AI | Your Smart Healthcare Companion</title>
+
+  <style>
+    :root {
+      --primary: #087e8b;
+      --primary-dark: #075b65;
+      --navy: #132b43;
+      --muted: #637487;
+      --background: #f5f9fb;
+      --border: #e0eaf0;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--navy);
+      background: var(--background);
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .container {
+      width: min(1120px, 92%);
+      margin: auto;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-inner {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -.6px;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      color: white;
+      background: var(--primary);
+      font-size: 25px;
+    }
+
+    .brand span:last-child {
+      color: var(--primary);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      font-size: 14px;
+      color: #43566b;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 12px 18px;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .button-outline {
+      color: var(--primary);
+      background: white;
+      border-color: #b9d9dd;
+    }
+
+    .button-outline:hover {
+      color: white;
+    }
+
+    .hero {
+      padding: 75px 0 65px;
+      background:
+        radial-gradient(ellipse at 85% 15%, #d7f1ef 0, transparent 38%),
+        linear-gradient(135deg, #f8fcfd, #edf7fa);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      align-items: center;
+      gap: 55px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      color: var(--primary-dark);
+      background: #e0f4f2;
+      padding: 7px 13px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: clamp(38px, 5vw, 60px);
+      line-height: 1.12;
+      letter-spacing: -2px;
+      margin: 22px 0;
+    }
+
+    .highlight {
+      color: var(--primary);
+    }
+
+    .hero p {
+      max-width: 550px;
+      color: var(--muted);
+      font-size: 17px;
+      margin-bottom: 27px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-note {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hero-visual {
+      min-height: 335px;
+      border: 1px solid #d9e9ed;
+      border-radius: 26px;
+      background: linear-gradient(145deg, #e0f4f2, #f9ffff);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 15px;
+      box-shadow: 0 22px 65px #174b5c12;
+    }
+
+    .visual-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mini-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      color: #137553;
+      background: #e2f6ec;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .health-card {
+      background: white;
+      border: 1px solid #e6eef2;
+      border-radius: 17px;
+      padding: 17px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 8px 25px #14374b08;
+    }
+
+    .health-icon {
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: #e3f5f4;
+      font-size: 22px;
+    }
+
+    .health-card strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .health-card small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section {
+      padding: 72px 0;
+    }
+
+    .section-heading {
+      max-width: 650px;
+      margin: 0 auto 35px;
+      text-align: center;
+    }
+
+    .section-heading h2 {
+      margin: 0 0 12px;
+      font-size: clamp(27px, 4vw, 38px);
+      letter-spacing: -1px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .feature {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .feature:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px #14374b0b;
+    }
+
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: #e4f5f3;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .feature h3 {
+      margin: 0 0 9px;
+      font-size: 18px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0 0 16px;
+    }
+
+    .feature-link {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      color: #74591b;
+      background: #fff3d6;
+      padding: 4px 8px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .checker-section {
+      background: #eaf4f7;
+    }
+
+    .checker {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: clamp(20px, 4vw, 35px);
+      box-shadow: 0 15px 45px #14374b09;
+    }
+
+    .checker h2 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    #search {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1px solid #cedce5;
+      border-radius: 10px;
+      margin: 15px 0;
+      outline-color: var(--primary);
+    }
+
+    .symptoms {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 3px;
+    }
+
+    .symptoms label {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    .symptoms label:has(input:checked) {
+      border-color: var(--primary);
+      background: #eef9f8;
+    }
+
+    .symptoms input {
+      accent-color: var(--primary);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .checker-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    #output {
+      margin-top: 25px;
+      overflow-wrap: anywhere;
+    }
+
+    .result-card {
+      padding: 15px;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .warning {
+      background: #fff7e8;
+      border: 1px solid #f2d9a7;
+      color: #80531b;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .step {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 15px;
+      color: white;
+      background: var(--primary);
+      font-weight: 800;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .cta {
+      background: var(--navy);
+      color: white;
+      border-radius: 24px;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+    }
+
+    .cta h2 {
+      margin: 0 0 8px;
+      font-size: 29px;
+    }
+
+    .cta p {
+      color: #c4d3df;
+      margin: 0;
+    }
+
+    footer {
+      background: white;
+      border-top: 1px solid var(--border);
+      margin-top: 70px;
+      padding: 30px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .mobile-only {
+      display: none;
+    }
+
+    @media (max-width: 800px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 35px;
+      }
+
+      .hero {
+        padding: 50px 0;
+      }
+
+      .features {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .symptoms {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .nav-links {
+        gap: 12px;
+      }
+
+      .nav-links .optional {
+        display: none;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .brand {
+        font-size: 18px;
+      }
+
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      .nav-inner {
+        min-height: 65px;
+      }
+
+      .nav-links {
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .nav-links .button {
+        padding: 9px 10px;
+      }
+
+      .features, .steps, .symptoms {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 50px 0;
+      }
+
+      .hero-visual {
+        min-height: auto;
+        padding: 14px;
+      }
+
+      .cta {
+        padding: 25px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="#home" aria-label="MediGuide AI home">
+      <span class="brand-icon">✚</span>
+      <span>MediGuide <span>AI</span></span>
+    </a>
+
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a class="optional" href="#how-it-works">How it works</a>
+      <a href="#symptom-checker">Symptom Checker</a>
+      {% if session.get("user_id") %}
+      <a href="/dashboard">My Dashboard</a>
+      <form action="/logout" method="POST" style="display:inline;margin:0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="button button-outline" type="submit">Log Out</button>
+      </form>
+      {% else %}
+      <a href="/login">Log In</a>
+      <a class="button" href="/register">Create Account ↗</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container" style="margin-top: 16px;">
+      {% for category, message in messages %}
+        <div style="padding: 12px 18px; border-radius: 10px; background: {% if category == 'error' %}#fff0e9{% else %}#e7f8ee{% endif %}; color: {% if category == 'error' %}#c92a2a{% else %}#075b65{% endif %}; font-weight: 600; border: 1px solid {% if category == 'error' %}#ffc9c9{% else %}#b7e4c7{% endif %};">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main>
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div>
+        <span class="eyebrow">✦ YOUR SMART HEALTHCARE COMPANION</span>
+
+        <h1>
+          Understand your health.
+          <span class="highlight">Make informed choices.</span>
+        </h1>
+
+        <p>
+          Explore your symptoms, discover reliable health information,
+          and learn about your next steps with MediGuide AI.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button" href="#symptom-checker">
+            Check Your Symptoms →
+          </a>
+          <a class="button button-outline" href="#features">
+            Explore Features
+          </a>
+        </div>
+
+        <div class="hero-note">
+          Educational health support · Privacy-conscious design ·
+          Not a replacement for medical care
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="visual-top">
+          <div>
+            <strong>Your health, made easier</strong>
+            <div class="mini-label">Explore your available tools</div>
+          </div>
+          <span class="status">AI ASSISTANT</span>
+        </div>
+
+        <div class="health-card">
+          <div class="health-icon">♡</div>
+          <div>
+            <strong>Symptom Checker</strong>
+            <small>Explore possible conditions from selected symptoms</small>
+          </div>
+        </div>
+
+        <div class="health-card">
+          <div class="health-icon">▧</div>
+          <div>
+            <strong>Skin Photo Analysis</strong>
+            <small>Planned feature for supported skin images</small>
+          </div>
+        </div>
+
+        <div class="health-card">
+          <div class="health-icon">⌖</div>
+          <div>
+            <strong>Find a Doctor</strong>
+            <small>Discover nearby healthcare providers</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Healthcare tools in one place</h2>
+        <p>
+          Explore tools designed to help you understand health information
+          and find appropriate professional care.
+        </p>
+      </div>
+
+      <div class="features">
+        <article class="feature">
+          <div class="feature-icon">♡</div>
+          <h3>AI Symptom Checker</h3>
+          <p>
+            Select symptoms and explore the possible conditions suggested
+            by our educational machine-learning model.
+          </p>
+          <a class="feature-link" href="#symptom-checker">
+            Try symptom checker →
+          </a>
+        </article>
+
+        <article class="feature">
+          <div class="feature-icon">▧</div>
+          <span class="tag">Planned feature</span>
+          <h3>Skin Photo Analysis</h3>
+          <p>
+            A future image-analysis tool for a defined set of skin conditions,
+            with clear limitations and guidance on professional evaluation.
+          </p>
+          <a class="feature-link" href="#skin-feature">
+            Explore the feature →
+          </a>
+        </article>
+
+        <article class="feature">
+          <div class="feature-icon">⌖</div>
+          <span class="tag">Planned feature</span>
+          <h3>Find Nearby Doctors</h3>
+          <p>
+            Find healthcare providers by location, specialty and available
+            clinic information once the directory integration is configured.
+          </p>
+          <a class="feature-link" href="#doctor-feature">
+            Explore the feature →
+          </a>
+        </article>
+
+        <article class="feature">
+          <div class="feature-icon">✚</div>
+          <span class="tag">Planned feature</span>
+          <h3>Health Guidance</h3>
+          <p>
+            Access reviewed educational information about common causes,
+            prevention, self-care and warning signs.
+          </p>
+          <a class="feature-link" href="#how-it-works">
+            Learn how it works →
+          </a>
+        </article>
+
+        <article class="feature">
+          <div class="feature-icon">▤</div>
+          <span class="tag">Planned feature</span>
+          <h3>Personal Dashboard</h3>
+          <p>
+            A future account area for profile settings and optional,
+            user-authorized assessment history.
+          </p>
+          <a class="feature-link" href="#account-feature">
+            Explore the feature →
+          </a>
+        </article>
+
+        <article class="feature">
+          <div class="feature-icon">♧</div>
+          <span class="tag">Planned feature</span>
+          <h3>Secure User Accounts</h3>
+          <p>
+            Email and password registration, login, logout and protected
+            personal pages will be added in the next development stage.
+          </p>
+          <a class="feature-link" href="#account-feature">
+            Learn more →
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section checker-section" id="symptom-checker">
+    <div class="container">
+      <div class="checker">
+        <h2>Let's explore your symptoms</h2>
+        <p class="muted">
+          Select the symptoms you want to explore. The model will return
+          its top predictions for educational purposes.
+        </p>
+
+        <input
+          id="search"
+          type="text"
+          placeholder="Search symptoms..."
+          aria-label="Search symptoms"
+        >
+
+        <div class="symptoms" id="symptomList">
+          {% for symptom in symptoms %}
+          <label>
+            <input type="checkbox" value="{{ symptom }}">
+            <span>{{ symptom.replace('_', ' ') }}</span>
+          </label>
+          {% endfor %}
+        </div>
+
+        <div class="checker-actions">
+          <button class="button" id="predictButton" onclick="predict()">
+            Check Symptoms →
+          </button>
+
+          <button
+            class="button button-outline"
+            type="button"
+            onclick="clearSymptoms()"
+          >
+            Clear Selection
+          </button>
+        </div>
+
+        <div id="output" aria-live="polite"></div>
+
+        <div class="warning">
+          <strong>Important:</strong> This is an educational prototype,
+          not a medical diagnosis. Model scores are not validated
+          probabilities of disease. Seek professional medical advice.
+          For a possible emergency, contact local emergency services
+          immediately.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Simple to get started</h2>
+        <p>Three simple steps to explore the current symptom checker.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Select symptoms</h3>
+          <p>Choose the symptoms you want to explore from the available list.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>View model output</h3>
+          <p>See the conditions suggested by the trained model.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Seek appropriate care</h3>
+          <p>Use reliable health information and consult a qualified clinician.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" id="skin-feature">
+    <div class="cta">
+      <div>
+        <h2>Skin Photo Analysis</h2>
+        <p>
+          Image upload and model-based analysis are planned for a future
+          version. This feature is not yet available.
+        </p>
+      </div>
+      <span class="tag">Coming in a future version</span>
+    </div>
+  </section>
+
+  <section class="container" id="doctor-feature" style="padding-top:24px">
+    <div class="cta">
+      <div>
+        <h2>Find Healthcare Providers</h2>
+        <p>
+          A doctor directory with specialties, clinic locations and
+          published opening hours will be added after integration.
+        </p>
+      </div>
+      <span class="tag">Coming in a future version</span>
+    </div>
+  </section>
+
+  <section class="container" id="account-feature" style="padding-top:24px">
+    <div class="cta">
+      <div>
+        <h2>Your account, your control</h2>
+        <p>
+          Secure email registration and login will be developed next.
+          No account is required for this prototype.
+        </p>
+      </div>
+      <span class="tag">Authentication not enabled yet</span>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <div>
+      <strong>MediGuide AI</strong>
+      <div>Smart healthcare information for informed choices.</div>
+    </div>
+    <div>
+      Educational prototype · Not for diagnosis or treatment
+    </div>
+  </div>
+</footer>
+
+<script>
+  const output = document.getElementById("output");
+  const button = document.getElementById("predictButton");
+
+  document.getElementById("search").addEventListener("input", function () {
+    const query = this.value.toLowerCase().trim();
+
+    document.querySelectorAll("#symptomList label").forEach(label => {
+      label.style.display =
+        label.textContent.toLowerCase().includes(query) ? "" : "none";
+    });
+  });
+
+  function clearSymptoms() {
+    document.querySelectorAll(
+      '#symptomList input[type="checkbox"]'
+    ).forEach(item => item.checked = false);
+
+    output.replaceChildren();
+  }
+
+  async function predict() {
+    const chosen = Array.from(
+      document.querySelectorAll(
+        '#symptomList input[type="checkbox"]:checked'
+      )
+    ).map(item => item.value);
+
+    if (chosen.length === 0) {
+      output.textContent = "Please select at least one symptom.";
+      return;
+    }
+
+    button.disabled = true;
+    output.textContent = "Processing your selection...";
+
+    try {
+      const response = await fetch("/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({symptoms: chosen})
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        output.textContent = data.error || "Unable to process the request.";
+        return;
+      }
+
+      output.replaceChildren();
+
+      if (data.emergency_alert) {
+        const emergencyBox = document.createElement("div");
+        emergencyBox.style.cssText = "background:#fff5f5; border:1px solid #ffc9c9; border-left:6px solid #d90429; border-radius:10px; padding:16px; margin-bottom:16px; color:#c92a2a; font-weight:600; font-size:14px; text-align:left;";
+        emergencyBox.textContent = data.emergency_alert;
+        output.appendChild(emergencyBox);
+      }
+
+      const heading = document.createElement("h3");
+      heading.textContent = "Model Predictions";
+      output.appendChild(heading);
+
+      data.results.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "result-card";
+        card.style.textAlign = "left";
+
+        const name = document.createElement("strong");
+        name.style.display = "block";
+        name.style.fontSize = "16px";
+        name.textContent = item.title || item.disease;
+
+        const score = document.createElement("div");
+        score.className = "muted";
+        score.style.fontSize = "13px";
+        score.style.margin = "4px 0";
+        score.textContent = "Model score: " + item.confidence + "%";
+
+        card.append(name, score);
+
+        if (item.slug) {
+          const guideLink = document.createElement("a");
+          guideLink.href = "/conditions/" + encodeURIComponent(item.slug);
+          guideLink.style.cssText = "display:inline-block; margin-top:6px; color:#087e8b; font-weight:700; font-size:13px;";
+          guideLink.textContent = "View Condition Guide & Self-Care →";
+          card.appendChild(guideLink);
+        }
+
+        output.appendChild(card);
+      });
+
+      const urgency = document.createElement("p");
+      urgency.textContent = data.urgency;
+      output.appendChild(urgency);
+
+      const disclaimer = document.createElement("p");
+      disclaimer.className = "muted";
+      disclaimer.textContent = data.disclaimer;
+      output.appendChild(disclaimer);
+
+    } catch (error) {
+      output.textContent = "Could not connect to the healthcare service. Please check your network and try again.";
+    } finally {
+      button.disabled = false;
+    }
+  }
+</script>
+
+</body>
+</html>

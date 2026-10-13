@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assessment History | MediGuide AI</title>
+  <style>
+    :root {
+      --primary: #087e8b;
+      --primary-dark: #075b65;
+      --navy: #132b43;
+      --muted: #637487;
+      --background: #f3f8fa;
+      --border: #e0eaf0;
+      --card-bg: #ffffff;
+      --danger: #d90429;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--background); color: var(--navy);
+      font-family: Inter, "Segoe UI", Arial, sans-serif; line-height: 1.5;
+    }
+    header {
+      background: white; padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .container { width: min(920px, 92%); margin: auto; }
+    .brand { color: var(--primary); font-size: 22px; font-weight: 800; text-decoration: none; }
+    .nav-links { float: right; display: flex; gap: 18px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; }
+    .nav-links a:hover { color: var(--primary); }
+    main { padding: 40px 0 60px; }
+    .header-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 14px;
+    }
+    h1 { margin: 0; font-size: 26px; }
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(19, 43, 67, 0.04);
+    }
+    .assessment-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 14px;
+    }
+    .disease-title { font-size: 20px; font-weight: 700; color: var(--navy); }
+    .confidence-badge {
+      display: inline-block; padding: 4px 12px; border-radius: 20px;
+      font-weight: 700; font-size: 13px; background: #e0f4f2; color: var(--primary-dark);
+    }
+    .pill {
+      display: inline-block; padding: 4px 10px; margin: 4px 4px 4px 0;
+      border-radius: 8px; background: #edf4f8; color: #2c4257; font-size: 12px;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .btn {
+      display: inline-block; border: none; border-radius: 9px;
+      padding: 9px 16px; background: var(--primary); color: white;
+      font-weight: 700; cursor: pointer; font-size: 13px; text-decoration: none;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn-danger { background: var(--danger); }
+    .btn-danger:hover { background: #b00320; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-outline { background: white; color: var(--muted); border: 1px solid var(--border); }
+    .btn-outline:hover { color: var(--danger); border-color: var(--danger); }
+    .message {
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;
+      font-size: 14px; font-weight: 600;
+    }
+    .message.success { background: #e7f8ee; color: #075b65; border: 1px solid #b7e4c7; }
+    .message.error { background: #fff0e9; color: #c92a2a; border: 1px solid #ffc9c9; }
+    .banner {
+      background: #e2f5f3; border: 1px solid #b7e4c7; border-radius: 12px;
+      padding: 16px 20px; margin-bottom: 24px; display: flex;
+      justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    .empty-state {
+      text-align: center; padding: 60px 20px; background: white;
+      border-radius: 16px; border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+      <a class="brand" href="/">✚ MediGuide AI</a>
+      <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Profile & Settings</a>
+        <a href="/">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="header-bar">
+      <div>
+        <h1>My Assessment History</h1>
+        <p class="muted" style="margin:4px 0 0;">Private, user-consented records of your previous symptom evaluations.</p>
+      </div>
+      {% if assessments %}
+      <form method="POST" action="/history/clear-all" onsubmit="return confirm('Clear your entire assessment history? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="btn btn-outline">Clear All History</button>
+      </form>
+      {% endif %}
+    </div>
+
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="message {{ category }}">{{ message }}</div>
+    {% endfor %}
+
+    <!-- Consent Status Banner -->
+    <div class="banner">
+      <div>
+        <strong>Privacy Consent: </strong>
+        {% if consent_save_history %}
+          <span style="color:#075b65; font-weight:700;">Active (Assessments are saved)</span>
+        {% else %}
+          <span style="color:#c92a2a; font-weight:700;">Disabled (New assessments are not saved)</span>
+        {% endif %}
+      </div>
+      <a href="/profile" class="btn btn-sm" style="background:#087e8b;">Change Consent</a>
+    </div>
+
+    {% if assessments %}
+      {% for item in assessments %}
+      <article class="card">
+        <div class="assessment-header">
+          <div>
+            <div class="disease-title">{{ item.top_disease }}</div>
+            <div class="muted">Recorded on {{ item.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+          </div>
+          <div>
+            <span class="confidence-badge">Score: {{ item.confidence }}%</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <strong class="muted" style="display:block; margin-bottom:6px;">Evaluated Symptoms:</strong>
+          {% for s in item.symptoms_list %}
+            <span class="pill">{{ s.replace('_', ' ') }}</span>
+          {% endfor %}
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f0f4f7; padding-top:12px; margin-top:12px;">
+          <span class="muted" style="font-size:12px;">⚠️ Educational output only. Not a medical diagnosis.</span>
+          <form method="POST" action="/history/{{ item.id }}/delete" onsubmit="return confirm('Delete this record?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn btn-outline btn-sm">Delete</button>
+          </form>
+        </div>
+      </article>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div style="font-size: 40px; margin-bottom: 12px;">📋</div>
+        <h2>No Saved Assessments Yet</h2>
+        <p class="muted" style="max-width: 480px; margin: 0 auto 20px;">
+          {% if consent_save_history %}
+            Your privacy consent is enabled. Run a symptom evaluation on the homepage to see your educational results here.
+          {% else %}
+            Assessment history is currently disabled in your privacy settings. Enable it in your profile if you wish to retain previous evaluations.
+          {% endif %}
+        </p>
+        <a href="/#symptom-checker" class="btn">Open Symptom Checker →</a>
+      </div>
+    {% endif %}
+  </main>
+</body>
+</html>

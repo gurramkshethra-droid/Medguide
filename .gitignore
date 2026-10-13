@@ -1,0 +1,17 @@
+users.db
+mediguide.db
+*.db
+*.sqlite3
+.env
+.venv/
+__pycache__/
+*.pyc
+uploads/
+.pytest_cache/
+
+.env.*
+!.env.example
+instance/
+logs/
+*.log
+

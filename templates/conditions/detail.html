@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ condition.title }} — Symptoms, Causes & Guidance | MediGuide AI</title>
+  <style>
+    :root {
+      --primary: #087e8b;
+      --primary-dark: #075b65;
+      --navy: #132b43;
+      --muted: #637487;
+      --background: #f5f9fb;
+      --border: #e0eaf0;
+      --card-bg: #ffffff;
+      --danger: #d90429;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--background); color: var(--navy);
+      font-family: Inter, "Segoe UI", Arial, sans-serif; line-height: 1.6;
+    }
+    header {
+      background: white; padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .container { width: min(920px, 92%); margin: auto; }
+    .brand { color: var(--primary); font-size: 22px; font-weight: 800; text-decoration: none; }
+    .nav-links { float: right; display: flex; gap: 20px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; }
+    .nav-links a:hover { color: var(--primary); }
+    main { padding: 40px 0 70px; }
+    .back-link {
+      display: inline-block; margin-bottom: 20px; color: var(--muted);
+      text-decoration: none; font-size: 14px; font-weight: 600;
+    }
+    .back-link:hover { color: var(--primary); }
+    .card {
+      background: white; border: 1px solid var(--border); border-radius: 18px;
+      padding: 32px; box-shadow: 0 4px 18px rgba(19, 43, 67, 0.04);
+      margin-bottom: 24px;
+    }
+    .header-card {
+      background: linear-gradient(135deg, #e8f7f5, #ffffff);
+      border-color: #cce9ea;
+    }
+    h1 { margin: 8px 0 12px; font-size: 30px; color: var(--navy); }
+    h2 { font-size: 20px; margin: 28px 0 12px; color: var(--navy); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .badge {
+      display: inline-block; padding: 5px 12px; border-radius: 20px;
+      background: #e0f4f2; color: var(--primary-dark); font-size: 13px; font-weight: 700;
+    }
+    .badge-emergency {
+      background: #ffe3e3; color: #c92a2a; border: 1px solid #ffa8a8;
+    }
+    .emergency-box {
+      background: #fff5f5; border: 1px solid #ffc9c9; border-left: 6px solid var(--danger);
+      border-radius: 12px; padding: 20px; margin-bottom: 24px;
+    }
+    .emergency-box h3 { margin: 0 0 6px; color: var(--danger); font-size: 18px; }
+    ul { padding-left: 20px; margin: 8px 0 16px; }
+    li { margin-bottom: 8px; }
+    .btn {
+      display: inline-block; padding: 12px 22px; border-radius: 10px;
+      background: var(--primary); color: white; font-weight: 700;
+      text-decoration: none; font-size: 14px; margin-top: 10px;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .disclaimer-box {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 16px 20px; font-size: 13px; color: var(--muted); margin-top: 30px;
+    }
+    .source-tag {
+      display: inline-block; background: #edf2f7; padding: 6px 12px;
+      border-radius: 8px; font-size: 13px; margin: 4px 6px 4px 0;
+      color: #2b6cb0; text-decoration: none; font-weight: 600;
+    }
+    .source-tag:hover { text-decoration: underline; background: #e2e8f0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+      <a class="brand" href="/">✚ MediGuide AI</a>
+      <div class="nav-links">
+        <a href="/#symptom-checker">Symptom Checker</a>
+        <a href="/conditions">All Conditions</a>
+        <a href="/doctors">Find Doctors</a>
+        <a href="/dashboard">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <a href="/conditions" class="back-link">← Back to All Condition Guides</a>
+
+    {% if is_emergency %}
+    <div class="emergency-box">
+      <h3>🚨 Critical Medical Emergency Warning</h3>
+      <p style="margin:0 0 10px; color:#495057;">
+        <strong>{{ condition.title }}</strong> can present as a time-sensitive, life-threatening emergency.
+        If you or someone near you exhibits severe chest pressure, sudden numbness/paralysis, difficulty speaking, or loss of consciousness,
+        <strong>CALL EMERGENCY SERVICES (911 / 112 / 999) IMMEDIATELY</strong>. Do not wait or drive yourself to the hospital.
+      </p>
+    </div>
+    {% endif %}
+
+    <article class="card header-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <span class="badge">{{ condition.specialty }}</span>
+        {% if is_emergency %}
+        <span class="badge badge-emergency">URGENT MEDICAL ASSESSMENT</span>
+        {% endif %}
+      </div>
+      <h1>{{ condition.title }}</h1>
+      <p style="font-size: 17px; margin: 0; color: #2d3748;">{{ condition.description }}</p>
+    </article>
+
+    <div class="card">
+      <h2>Common Symptoms Reported</h2>
+      <ul>
+        {% for s in condition.symptoms %}
+          <li><strong>{{ s }}</strong></li>
+        {% endfor %}
+      </ul>
+
+      <h2>Possible Causes & Contributing Factors</h2>
+      <ul>
+        {% for c in condition.causes %}
+          <li>{{ c }}</li>
+        {% endfor %}
+      </ul>
+
+      <h2>General Prevention & Risk Reduction</h2>
+      <ul>
+        {% for p in condition.prevention %}
+          <li>{{ p }}</li>
+        {% endfor %}
+      </ul>
+
+      <h2>Evidence-Based Self-Care Measures</h2>
+      <ul>
+        {% for sc in condition.self_care %}
+          <li>{{ sc }}</li>
+        {% endfor %}
+      </ul>
+
+      <h2 style="color:var(--danger);">⚠️ Warning Signs — When to Seek Immediate Medical Help</h2>
+      <ul>
+        {% for ws in condition.warning_signs %}
+          <li style="color:#b00320;"><strong>{{ ws }}</strong></li>
+        {% endfor %}
+      </ul>
+
+      <h2>Recommended Clinical Specialty</h2>
+      <p>
+        For clinical evaluation, diagnosis, and treatment planning, consult a specialist in:
+        <br><strong style="font-size:16px; color:var(--primary);">{{ condition.specialty }}</strong>
+      </p>
+      <a href="/doctors?specialty={{ condition.specialty | urlencode }}" class="btn">
+        Find Local Clinics & Doctors in {{ condition.specialty.split('/')[0].strip() }} →
+      </a>
+
+      <h2>Curated Medical References & Sources</h2>
+      <p class="muted" style="margin-bottom:8px;">Reviewed against trusted public healthcare agencies:</p>
+      <div>
+        {% for src in condition.sources %}
+          <a href="{{ src.url }}" target="_blank" rel="noopener noreferrer" class="source-tag">
+            🔗 {{ src.name }} ↗
+          </a>
+        {% endfor %}
+      </div>
+
+      <div class="disclaimer-box">
+        <strong>Educational Purpose Disclaimer:</strong> The information provided in this guide is synthesized from public clinical sources (NHS, CDC, WHO, MedlinePlus) strictly for educational and awareness purposes. It does not constitute medical advice, definitive diagnosis, or therapeutic prescription. Always consult a licensed healthcare professional for personal medical concerns.
+      </div>
+    </div>
+  </main>
+</body>
+</html>

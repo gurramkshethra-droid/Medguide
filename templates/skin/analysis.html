@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skin Photo Analysis & Dermatological Guidance | MediGuide AI</title>
+  <style>
+    :root {
+      --primary: #087e8b;
+      --primary-dark: #075b65;
+      --navy: #132b43;
+      --muted: #637487;
+      --background: #f5f9fb;
+      --border: #e0eaf0;
+      --card-bg: #ffffff;
+      --danger: #d90429;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--background); color: var(--navy);
+      font-family: Inter, "Segoe UI", Arial, sans-serif; line-height: 1.5;
+    }
+    header {
+      background: white; padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .container { width: min(960px, 92%); margin: auto; }
+    .brand { color: var(--primary); font-size: 22px; font-weight: 800; text-decoration: none; }
+    .nav-links { float: right; display: flex; gap: 20px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; }
+    .nav-links a:hover { color: var(--primary); }
+    main { padding: 40px 0 70px; }
+    .hero {
+      background: linear-gradient(135deg, #e4f5f4, #f4fafb);
+      padding: 35px 30px; border-radius: 18px; border: 1px solid #d4ebec;
+      margin-bottom: 30px;
+    }
+    h1 { margin: 0 0 10px; font-size: 28px; }
+    .card {
+      background: white; border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px; box-shadow: 0 4px 18px rgba(19, 43, 67, 0.04);
+      margin-bottom: 24px;
+    }
+    .upload-zone {
+      border: 2px dashed #b9d9dd; border-radius: 14px; padding: 36px 20px;
+      text-align: center; background: #fafdfe; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .upload-zone:hover { border-color: var(--primary); background: #f0f9fa; }
+    .btn {
+      padding: 12px 22px; border-radius: 10px; border: none; background: var(--primary);
+      color: white; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 14px;
+      display: inline-block;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn-outline { background: white; color: var(--muted); border: 1px solid var(--border); }
+    .preview-box {
+      display: none; margin-top: 20px; text-align: center;
+    }
+    .preview-img {
+      max-width: 240px; max-height: 240px; border-radius: 12px;
+      border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .abcde-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px; margin: 20px 0;
+    }
+    .abcde-card {
+      background: #f8fbfd; border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px; display: flex; gap: 14px; align-items: flex-start;
+    }
+    .letter-circle {
+      display: grid; place-items: center; width: 38px; height: 38px;
+      border-radius: 10px; background: var(--primary); color: white;
+      font-weight: 800; font-size: 18px; flex-shrink: 0;
+    }
+    .message {
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;
+      font-size: 14px; font-weight: 600;
+    }
+    .message.error { background: #fff0e9; color: #c92a2a; border: 1px solid #ffc9c9; }
+    .disclaimer-box {
+      background: #edf4f8; border-radius: 12px; padding: 18px;
+      font-size: 13px; color: var(--muted); margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+      <a class="brand" href="/">✚ MediGuide AI</a>
+      <div class="nav-links">
+        <a href="/#symptom-checker">Symptom Checker</a>
+        <a href="/conditions">Health Guides</a>
+        <a href="/doctors">Find Doctors</a>
+        <a href="/dashboard">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="hero">
+      <span style="display:inline-block; padding:4px 10px; border-radius:14px; background:#d4ebec; color:var(--primary-dark); font-size:11px; font-weight:700; margin-bottom:10px;">
+        EDUCATIONAL DERMATOLOGY MODULE
+      </span>
+      <h1>Skin Photo Analysis & Triage</h1>
+      <p style="color:var(--muted); margin:0; max-width:680px;">
+        Upload a high-resolution close-up photo of a skin lesion or rash. MediGuide AI performs client-side inspection, dimension validation, and connects you with evidence-based dermatological screening guidance (ABCDE Criteria).
+      </p>
+    </div>
+
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="message {{ category }}">{{ message }}</div>
+    {% endfor %}
+
+    <!-- Upload Section -->
+    <section class="card">
+      <h2 style="margin:0 0 8px; font-size:20px;">Upload Skin Photo for Inspection</h2>
+      <p style="color:var(--muted); font-size:14px; margin-top:0;">
+        Supported formats: PNG, JPG, JPEG, WEBP. Maximum file size: 5 MB. Photos are processed ephemerally in memory and never stored without consent.
+      </p>
+
+      <form method="POST" action="/skin-analysis" enctype="multipart/form-data" id="skinForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+          <div style="font-size:36px; margin-bottom:10px;">📷</div>
+          <strong>Click to select a skin photo</strong> or drag and drop image here
+          <p style="color:var(--muted); font-size:12px; margin:6px 0 0;">Ensure good lighting and sharp focus on the lesion.</p>
+          <input
+            id="fileInput"
+            name="skin_image"
+            type="file"
+            accept="image/png, image/jpeg, image/webp"
+            style="display:none;"
+            onchange="handleFileSelect(this)"
+            required
+          >
+        </div>
+
+        <div class="preview-box" id="previewBox">
+          <img id="previewImage" class="preview-img" alt="Uploaded skin photo preview">
+          <div style="margin-top:12px;">
+            <span id="fileName" style="font-size:13px; font-weight:600; color:var(--navy);"></span>
+            <button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:12px; margin-left:10px;" onclick="clearFile()">Remove</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:12px;">
+          <button type="submit" class="btn">Analyze Image →</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Results Section -->
+    {% if result %}
+    <section class="card" style="border-color:#b9d9dd; background:#fcfeff;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+        <h2 style="margin:0; font-size:22px; color:var(--primary-dark);">Inspection Pipeline Results</h2>
+        <span style="font-size:12px; color:var(--muted);">Token: {{ result.token }}</span>
+      </div>
+
+      <div style="background:#eaf6f5; border:1px solid #b7e4c7; border-radius:10px; padding:16px; margin:18px 0; font-size:14px; color:#075b65;">
+        <strong>Verified Image Properties:</strong>
+        {{ result.image_metadata.dimensions }} | {{ result.image_metadata.format }} Format | {{ result.image_metadata.size_kb }} KB
+      </div>
+
+      <h3>Dermatology Classification Task Specification</h3>
+      <p style="color:var(--muted); font-size:14px;">{{ result.task_spec.status_description }}</p>
+      <div style="margin-bottom:18px;">
+        <strong style="font-size:13px; color:var(--navy);">Benchmark Target Lesion Categories (HAM10000 Benchmark):</strong>
+        <ul style="color:var(--muted); font-size:13px; margin:8px 0 16px;">
+          {% for cls in result.task_spec.target_classes %}
+            <li>{{ cls }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <hr style="border:0; border-top:1px solid var(--border); margin:24px 0;">
+
+      <h2 style="margin:0 0 6px; font-size:20px;">Melanoma Screening: The ABCDE Clinical Criteria</h2>
+      <p style="color:var(--muted); font-size:14px; margin-top:0;">
+        Board-certified dermatologists recommend evaluating any concerning skin spot against these standard clinical criteria:
+      </p>
+
+      <div class="abcde-grid">
+        {% for item in result.clinical_guidance.abcde_criteria %}
+        <div class="abcde-card">
+          <div class="letter-circle">{{ item.letter }}</div>
+          <div>
+            <strong style="color:var(--navy);">{{ item.feature }}</strong>
+            <p style="margin:4px 0 0; font-size:13px; color:var(--muted);">{{ item.description }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div style="background:#fff5f5; border:1px solid #ffc9c9; border-left:5px solid var(--danger); border-radius:10px; padding:16px; margin-top:18px;">
+        <strong style="color:var(--danger);">When to Seek Urgent Care:</strong>
+        <p style="margin:4px 0 0; color:#495057; font-size:13px;">{{ result.clinical_guidance.urgent_advice }}</p>
+      </div>
+
+      <div style="margin-top:24px;">
+        <a href="/doctors?specialty=Dermatology" class="btn">Find Nearby Dermatologists →</a>
+      </div>
+    </section>
+    {% endif %}
+
+    <div class="disclaimer-box">
+      <strong>Essential Medical Safety Notice:</strong>
+      This skin photo inspection tool is an academic demonstration and engineering research prototype. It does not provide medical diagnoses or replace physical clinical dermoscopy. Automated models may produce false positives or false negatives. If you have an asymmetrical mole, rapidly changing spot, or unhealing lesion, consult a qualified physician or dermatologist immediately.
+    </div>
+  </main>
+
+  <script>
+    function handleFileSelect(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          document.getElementById("previewImage").src = e.target.result;
+          document.getElementById("fileName").textContent = file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
+          document.getElementById("previewBox").style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function clearFile() {
+      document.getElementById("fileInput").value = "";
+      document.getElementById("previewBox").style.display = "none";
+      document.getElementById("previewImage").src = "";
+    }
+  </script>
+</body>
+</html>

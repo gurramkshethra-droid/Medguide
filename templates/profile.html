@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Profile & Privacy Settings | MediGuide AI</title>
+  <style>
+    :root {
+      --primary: #087e8b;
+      --primary-dark: #075b65;
+      --navy: #132b43;
+      --muted: #637487;
+      --background: #f3f8fa;
+      --border: #e0eaf0;
+      --card-bg: #ffffff;
+      --danger: #d90429;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--background); color: var(--navy);
+      font-family: Inter, "Segoe UI", Arial, sans-serif; line-height: 1.5;
+    }
+    header {
+      background: white; padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .container { width: min(920px, 92%); margin: auto; }
+    .brand { color: var(--primary); font-size: 22px; font-weight: 800; text-decoration: none; }
+    .nav-links { float: right; display: flex; gap: 18px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; }
+    .nav-links a:hover { color: var(--primary); }
+    main { padding: 40px 0 60px; }
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; margin-bottom: 24px;
+      box-shadow: 0 4px 18px rgba(19, 43, 67, 0.04);
+    }
+    h1 { margin-top: 0; font-size: 26px; }
+    h2 { font-size: 19px; margin-top: 0; margin-bottom: 8px; color: var(--navy); }
+    .muted { color: var(--muted); font-size: 14px; }
+    .message {
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;
+      font-size: 14px; font-weight: 600;
+    }
+    .message.success { background: #e7f8ee; color: #075b65; border: 1px solid #b7e4c7; }
+    .message.error { background: #fff0e9; color: #c92a2a; border: 1px solid #ffc9c9; }
+    label { display: block; margin-top: 14px; font-weight: 600; font-size: 14px; }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%; padding: 11px 14px; margin-top: 6px;
+      border: 1px solid #cedce5; border-radius: 9px; font-size: 15px;
+    }
+    .checkbox-label {
+      display: flex; align-items: flex-start; gap: 12px; margin-top: 16px;
+      font-weight: normal; cursor: pointer;
+    }
+    .checkbox-label input { margin-top: 4px; }
+    .btn {
+      display: inline-block; border: none; border-radius: 9px;
+      padding: 11px 20px; background: var(--primary); color: white;
+      font-weight: 700; cursor: pointer; margin-top: 18px; font-size: 14px;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn-danger { background: var(--danger); }
+    .btn-danger:hover { background: #b00320; }
+    .btn-outline {
+      background: white; color: var(--primary); border: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; background: #e0f4f2; color: var(--primary-dark);
+    }
+    .danger-zone { border-color: #ffd8d8; background: #fffcfc; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+      <a class="brand" href="/">✚ MediGuide AI</a>
+      <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/history">Assessment History</a>
+        {% if role == 'admin' %}
+        <a href="/admin" style="color:var(--primary); font-weight:700;">Admin Portal</a>
+        {% endif %}
+        <a href="/">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Account Profile & Privacy Settings</h1>
+
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="message {{ category }}">{{ message }}</div>
+    {% endfor %}
+
+    <!-- Personal Info & Consent Card -->
+    <section class="card">
+      <h2>General Information & Consent Settings</h2>
+      <p class="muted">Manage your personal details and privacy preferences regarding healthcare assessment logs.</p>
+      
+      <form method="POST" action="/profile">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="update_info">
+
+        <label for="name">Full Name</label>
+        <input id="name" name="name" type="text" value="{{ name }}" maxlength="80" required>
+
+        <label for="email">Email Address (Read-only)</label>
+        <input id="email" type="email" value="{{ email }}" disabled style="background:#f4f6f8; color:#718096;">
+
+        <div style="margin-top: 15px;">
+          <span class="muted">Account Role:</span> <span class="badge">{{ role | upper }}</span>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 24px 0 16px;">
+
+        <h2>Privacy Consent Preferences</h2>
+        <p class="muted">
+          Under strict privacy-first design, MediGuide AI does not store symptom logs unless you explicitly opt in.
+        </p>
+
+        <label class="checkbox-label">
+          <input type="checkbox" name="consent_save_history" {% if consent_save_history %}checked{% endif %}>
+          <div>
+            <strong>Save my symptom checker assessments to my private history</strong><br>
+            <span class="muted">When unchecked, your symptom checks remain completely ephemeral and will not be recorded in our database.</span>
+          </div>
+        </label>
+
+        <button type="submit" class="btn">Save Preferences</button>
+      </form>
+    </section>
+
+    <!-- Change Password Card -->
+    <section class="card">
+      <h2>Change Password</h2>
+      <p class="muted">Update your account password. Choose a strong passphrase with at least 8 characters.</p>
+
+      <form method="POST" action="/profile">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="change_password">
+
+        <label for="current_password">Current Password</label>
+        <input id="current_password" name="current_password" type="password" required>
+
+        <label for="new_password">New Password</label>
+        <input id="new_password" name="new_password" type="password" minlength="8" maxlength="128" required>
+
+        <label for="confirm_password">Confirm New Password</label>
+        <input id="confirm_password" name="confirm_password" type="password" minlength="8" maxlength="128" required>
+
+        <button type="submit" class="btn">Update Password</button>
+      </form>
+    </section>
+
+    <!-- Danger Zone: Account Deletion -->
+    <section class="card danger-zone">
+      <h2 style="color:var(--danger)">Danger Zone: Delete Account</h2>
+      <p class="muted">
+        Permanently remove your account, profile, and all saved assessment records. This action cannot be reversed.
+      </p>
+
+      <form method="POST" action="/profile/delete-account" onsubmit="return confirm('Are you sure you want to permanently delete your MediGuide AI account? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <label for="delete_password">Enter Your Password to Confirm Deletion</label>
+        <input id="delete_password" name="password" type="password" required style="max-width: 360px;">
+
+        <div>
+          <button type="submit" class="btn btn-danger">Permanently Delete Account</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

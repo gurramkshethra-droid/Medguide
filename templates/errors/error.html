@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ code }} - {{ title }} | MediGuide AI</title>
+  <style>
+    :root {
+      --primary: #087e8b;
+      --navy: #132b43;
+      --muted: #637487;
+      --background: #f5f9fb;
+      --border: #e0eaf0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      padding: 20px; background: var(--background);
+      font-family: Inter, "Segoe UI", Arial, sans-serif; color: var(--navy);
+    }
+    .card {
+      width: 100%; max-width: 480px; padding: 40px; text-align: center;
+      border: 1px solid var(--border); border-radius: 20px;
+      background: white; box-shadow: 0 15px 45px rgba(19, 43, 67, 0.08);
+    }
+    .brand { color: var(--primary); font-size: 24px; font-weight: 800; text-decoration: none; }
+    .status-code {
+      font-size: 64px; font-weight: 900; color: var(--primary);
+      margin: 16px 0 0; line-height: 1;
+    }
+    h1 { font-size: 24px; margin: 10px 0; }
+    p { color: var(--muted); line-height: 1.6; margin-bottom: 25px; }
+    .button {
+      display: inline-block; padding: 12px 24px; border-radius: 10px;
+      background: var(--primary); color: white; text-decoration: none;
+      font-weight: 700; transition: opacity 0.2s;
+    }
+    .button:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <a class="brand" href="/">✚ MediGuide AI</a>
+    <div class="status-code">{{ code }}</div>
+    <h1>{{ title }}</h1>
+    <p>{{ message }}</p>
+    <a href="/" class="button">← Back to MediGuide AI</a>
+  </main>
+</body>
+</html>

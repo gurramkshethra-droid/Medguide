@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nearby Doctors & Healthcare Clinics | MediGuide AI</title>
+  <style>
+    :root {
+      --primary: #087e8b;
+      --primary-dark: #075b65;
+      --navy: #132b43;
+      --muted: #637487;
+      --background: #f5f9fb;
+      --border: #e0eaf0;
+      --card-bg: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--background); color: var(--navy);
+      font-family: Inter, "Segoe UI", Arial, sans-serif; line-height: 1.5;
+    }
+    header {
+      background: white; padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .container { width: min(1060px, 92%); margin: auto; }
+    .brand { color: var(--primary); font-size: 22px; font-weight: 800; text-decoration: none; }
+    .nav-links { float: right; display: flex; gap: 20px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; }
+    .nav-links a:hover { color: var(--primary); }
+    main { padding: 40px 0 70px; }
+    .hero {
+      background: linear-gradient(135deg, #e4f5f4, #f4fafb);
+      padding: 35px 30px; border-radius: 18px; border: 1px solid #d4ebec;
+      margin-bottom: 30px;
+    }
+    h1 { margin: 0 0 10px; font-size: 28px; }
+    .search-card {
+      background: white; border: 1px solid var(--border); border-radius: 16px;
+      padding: 24px; box-shadow: 0 4px 18px rgba(19, 43, 67, 0.04);
+      margin-bottom: 30px;
+    }
+    .form-grid {
+      display: grid; grid-template-columns: 1.5fr 1fr auto auto;
+      gap: 12px; align-items: end;
+    }
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    input, select {
+      width: 100%; padding: 11px 14px; border: 1px solid #cedce5;
+      border-radius: 9px; font-size: 14px; outline: none; background: white;
+    }
+    input:focus, select:focus { border-color: var(--primary); }
+    .btn {
+      padding: 11px 18px; border-radius: 9px; border: none;
+      background: var(--primary); color: white; font-weight: 700;
+      cursor: pointer; text-decoration: none; font-size: 14px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn-outline {
+      background: white; color: var(--primary); border: 1px solid var(--border);
+    }
+    .btn-outline:hover { background: #f0f7f9; }
+    .results-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .clinic-card {
+      background: white; border: 1px solid var(--border); border-radius: 14px;
+      padding: 22px; box-shadow: 0 4px 15px rgba(19, 43, 67, 0.03);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .clinic-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; color: var(--navy); }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 14px;
+      font-size: 11px; font-weight: 700; background: #e0f4f2; color: var(--primary-dark);
+      margin-bottom: 10px; text-transform: uppercase;
+    }
+    .clinic-meta {
+      font-size: 13px; color: var(--muted); margin: 6px 0; display: flex; gap: 8px; align-items: baseline;
+    }
+    .card-actions {
+      margin-top: 18px; padding-top: 14px; border-top: 1px solid #f0f4f7;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .directions-btn {
+      color: var(--primary); font-weight: 700; text-decoration: none; font-size: 13px;
+    }
+    .directions-btn:hover { text-decoration: underline; }
+    .attribution-box {
+      margin-top: 40px; padding: 18px; background: #edf4f8; border-radius: 12px;
+      font-size: 12px; color: var(--muted); line-height: 1.5;
+    }
+    #loadingIndicator {
+      display: none; text-align: center; padding: 40px; font-weight: 600; color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+      <a class="brand" href="/">✚ MediGuide AI</a>
+      <div class="nav-links">
+        <a href="/#symptom-checker">Symptom Checker</a>
+        <a href="/conditions">Health Guides</a>
+        <a href="/doctors" style="color:var(--primary); font-weight:700;">Find Doctors</a>
+        <a href="/dashboard">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="hero">
+      <span class="badge" style="background:#d4ebec;">OPENSTREETMAP CLINICAL GEODATABASE</span>
+      <h1>Nearby Doctors & Healthcare Clinics</h1>
+      <p style="color:var(--muted); margin:0; max-width:680px;">
+        Locate verified hospitals, healthcare clinics, and medical practitioners near your location. Powered strictly by public geospatial data from OpenStreetMap.
+      </p>
+    </div>
+
+    <section class="search-card">
+      <form id="doctorSearchForm" onsubmit="handleSearch(event)">
+        <div class="form-grid">
+          <div>
+            <label for="locationInput">City, Postal Code, or Neighborhood</label>
+            <input
+              id="locationInput"
+              name="location"
+              type="text"
+              value="{{ location }}"
+              placeholder="e.g. Hyderabad, London, New York, 500082"
+              required
+            >
+          </div>
+          <div>
+            <label for="specialtySelect">Medical Specialty (Optional)</label>
+            <select id="specialtySelect" name="specialty">
+              <option value="">All Specialties / General</option>
+              <option value="Cardiology" {% if 'Cardiology' in specialty %}selected{% endif %}>Cardiology (Heart)</option>
+              <option value="Dermatology" {% if 'Dermatology' in specialty %}selected{% endif %}>Dermatology (Skin)</option>
+              <option value="Pulmonology" {% if 'Pulmonology' in specialty %}selected{% endif %}>Pulmonology (Lungs & Asthma)</option>
+              <option value="Gastroenterology" {% if 'Gastroenterology' in specialty %}selected{% endif %}>Gastroenterology (Digestive)</option>
+              <option value="Neurology" {% if 'Neurology' in specialty %}selected{% endif %}>Neurology (Nerves & Headaches)</option>
+              <option value="Orthopedics" {% if 'Orthopedics' in specialty %}selected{% endif %}>Orthopedics (Bones & Joints)</option>
+              <option value="Pediatrics" {% if 'Pediatrics' in specialty %}selected{% endif %}>Pediatrics (Children)</option>
+              <option value="Rheumatology" {% if 'Rheumatology' in specialty %}selected{% endif %}>Rheumatology (Arthritis)</option>
+              <option value="Endocrinology" {% if 'Endocrinology' in specialty %}selected{% endif %}>Endocrinology (Diabetes & Thyroid)</option>
+              <option value="Infectious Disease" {% if 'Infectious' in specialty %}selected{% endif %}>Infectious Disease</option>
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn">Find Providers</button>
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline" onclick="locateUser()">📍 Near Me</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <div id="loadingIndicator">
+      <p>🔍 Querying OpenStreetMap healthcare nodes & verifying provider coordinates...</p>
+    </div>
+
+    <div id="resultsContainer">
+      {% if results_data %}
+        {% if results_data.status == 'success' %}
+          <div style="margin-bottom:18px; display:flex; justify-content:space-between; align-items:baseline;">
+            <p style="margin:0; font-size:14px; color:var(--muted);">
+              Found <strong>{{ results_data.results|length }}</strong> healthcare facilities near <strong>{{ results_data.location_name }}</strong>
+            </p>
+            <span style="font-size:12px; color:var(--muted);">Source: {{ results_data.source }}</span>
+          </div>
+
+          <div class="results-grid">
+            {% for c in results_data.results %}
+            <article class="clinic-card">
+              <div>
+                <span class="badge">{{ c.type | upper }}</span>
+                <h2 class="clinic-title">{{ c.name }}</h2>
+                <div class="clinic-meta">
+                  <span>🩺</span> <strong>Specialty:</strong> {{ c.specialty }}
+                </div>
+                <div class="clinic-meta">
+                  <span>📍</span> <span>{{ c.address }}</span>
+                </div>
+                <div class="clinic-meta">
+                  <span>🕒</span> <span>{{ c.opening_hours or 'Opening hours not published' }}</span>
+                </div>
+                {% if c.phone %}
+                <div class="clinic-meta">
+                  <span>📞</span> <a href="tel:{{ c.phone }}" style="color:var(--primary); font-weight:600;">{{ c.phone }}</a>
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="card-actions">
+                <span style="font-size:12px; color:var(--muted);">
+                  {% if c.opening_hours %}Published Hours{% else %}Call to confirm{% endif %}
+                </span>
+                <a
+                  class="directions-btn"
+                  href="https://www.google.com/maps/dir/?api=1&destination={{ c.lat }},{{ c.lon }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Get Directions ↗
+                </a>
+              </div>
+            </article>
+            {% endfor %}
+          </div>
+        {% elif results_data.status == 'empty' %}
+          <div style="text-align:center; padding:50px 20px; background:white; border-radius:14px; border:1px solid var(--border);">
+            <h3>No healthcare facilities found</h3>
+            <p style="color:var(--muted); max-width:500px; margin:auto;">{{ results_data.message }}</p>
+          </div>
+        {% elif results_data.status == 'error' or results_data.status == 'service_unavailable' %}
+          <div style="text-align:center; padding:50px 20px; background:white; border-radius:14px; border:1px solid #ffd8d8;">
+            <h3 style="color:#c92a2a;">Notice</h3>
+            <p style="color:var(--muted); max-width:500px; margin:auto;">{{ results_data.error or results_data.message }}</p>
+          </div>
+        {% endif %}
+      {% else %}
+        <div style="text-align:center; padding:60px 20px; background:white; border-radius:16px; border:1px solid var(--border);">
+          <div style="font-size:38px; margin-bottom:12px;">🏥</div>
+          <h2 style="font-size:20px; margin:0 0 8px;">Search for Nearby Clinics</h2>
+          <p style="color:var(--muted); max-width:500px; margin:auto;">
+            Enter your city or area above, or click "Near Me" to locate nearby medical practitioners and emergency hospitals.
+          </p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="attribution-box">
+      <strong>Public Geodata Attribution & Clinical Safety Notice:</strong>
+      Healthcare facility listings, geocoordinates, and published attributes are provided by OpenStreetMap under the Open Database License (ODbL). MediGuide AI does not own or operate healthcare facilities and never invents physician names, credentials, or schedules. Published opening hours do not constitute confirmed appointment availability. In a medical emergency, immediately call local emergency services (911 / 112 / 999).
+    </div>
+  </main>
+
+  <script>
+    async function handleSearch(e) {
+      // Standard form submission handles default GET workflow for SSR
+      // If Javascript is active, we can allow standard form submission to load results
+    }
+
+    function locateUser() {
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser. Please enter a city manually.");
+        return;
+      }
+
+      const loader = document.getElementById("loadingIndicator");
+      const container = document.getElementById("resultsContainer");
+      loader.style.display = "block";
+      container.style.opacity = "0.5";
+
+      navigator.geolocation.getCurrentPosition(
+        async function (pos) {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const specialty = document.getElementById("specialtySelect").value;
+
+          try {
+            const resp = await fetch("/api/doctors/search", {
+              method: "POST",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({lat: lat, lon: lon, specialty: specialty})
+            });
+            const data = await resp.json();
+            renderAsyncResults(data);
+          } catch (err) {
+            alert("Could not retrieve nearby facilities. Please try typing a city name.");
+          } finally {
+            loader.style.display = "none";
+            container.style.opacity = "1";
+          }
+        },
+        function (err) {
+          loader.style.display = "none";
+          container.style.opacity = "1";
+          alert("Location permission was denied or unavailable. Please enter a city name manually.");
+        },
+        { timeout: 10000, enableHighAccuracy: false }
+      );
+    }
+
+    function renderAsyncResults(data) {
+      const container = document.getElementById("resultsContainer");
+      container.replaceChildren();
+
+      if (data.status === "success" && data.results && data.results.length > 0) {
+        const header = document.createElement("div");
+        header.style.cssText = "margin-bottom:18px; display:flex; justify-content:space-between; align-items:baseline;";
+        header.innerHTML = '<p style="margin:0; font-size:14px; color:#637487;">Found <strong>' + data.results.length + '</strong> healthcare facilities near <strong>' + data.location_name + '</strong></p><span style="font-size:12px; color:#637487;">Source: ' + data.source + '</span>';
+        container.appendChild(header);
+
+        const grid = document.createElement("div");
+        grid.className = "results-grid";
+
+        data.results.forEach(c => {
+          const card = document.createElement("article");
+          card.className = "clinic-card";
+
+          const body = document.createElement("div");
+          const typeBadge = document.createElement("span");
+          typeBadge.className = "badge";
+          typeBadge.textContent = (c.type || "CLINIC").toUpperCase();
+
+          const title = document.createElement("h2");
+          title.className = "clinic-title";
+          title.textContent = c.name;
+
+          const spec = document.createElement("div");
+          spec.className = "clinic-meta";
+          spec.innerHTML = '<span>🩺</span> <strong>Specialty:</strong> ' + (c.specialty || "General Medicine");
+
+          const addr = document.createElement("div");
+          addr.className = "clinic-meta";
+          addr.innerHTML = '<span>📍</span> <span>' + (c.address || "Address not published") + '</span>';
+
+          const hours = document.createElement("div");
+          hours.className = "clinic-meta";
+          hours.innerHTML = '<span>🕒</span> <span>' + (c.opening_hours || "Opening hours not published") + '</span>';
+
+          body.append(typeBadge, title, spec, addr, hours);
+
+          if (c.phone) {
+            const phone = document.createElement("div");
+            phone.className = "clinic-meta";
+            phone.innerHTML = '<span>📞</span> <a href="tel:' + c.phone + '" style="color:#087e8b; font-weight:600;">' + c.phone + '</a>';
+            body.appendChild(phone);
+          }
+
+          const actions = document.createElement("div");
+          actions.className = "card-actions";
+          actions.innerHTML = '<span style="font-size:12px; color:#637487;">' + (c.opening_hours ? 'Published Hours' : 'Call to confirm') + '</span><a class="directions-btn" href="https://www.google.com/maps/dir/?api=1&destination=' + c.lat + ',' + c.lon + '" target="_blank" rel="noopener noreferrer">Get Directions ↗</a>';
+
+          card.append(body, actions);
+          grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+      } else {
+        const empty = document.createElement("div");
+        empty.style.cssText = "text-align:center; padding:50px 20px; background:white; border-radius:14px; border:1px solid #e0eaf0;";
+        empty.innerHTML = '<h3>No facilities found</h3><p style="color:#637487;">' + (data.message || data.error || 'No facilities matching the query were found.') + '</p>';
+        container.appendChild(empty);
+      }
+    }
+  </script>
+</body>
+</html>

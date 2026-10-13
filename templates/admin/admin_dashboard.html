@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard | MediGuide AI</title>
+  <style>
+    :root {
+      --primary: #087e8b;
+      --primary-dark: #075b65;
+      --navy: #132b43;
+      --muted: #637487;
+      --background: #f3f8fa;
+      --border: #e0eaf0;
+      --card-bg: #ffffff;
+      --danger: #d90429;
+      --success: #2b9348;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--background); color: var(--navy);
+      font-family: Inter, "Segoe UI", Arial, sans-serif; line-height: 1.5;
+    }
+    header {
+      background: white; padding: 18px 0; border-bottom: 1px solid var(--border);
+    }
+    .container { width: min(1080px, 94%); margin: auto; }
+    .brand { color: var(--primary); font-size: 22px; font-weight: 800; text-decoration: none; }
+    .nav-links { float: right; display: flex; gap: 18px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px; }
+    .nav-links a:hover { color: var(--primary); }
+    main { padding: 40px 0 60px; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { font-size: 20px; margin-top: 32px; margin-bottom: 16px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px; margin-top: 24px;
+    }
+    .stat-card {
+      background: white; border: 1px solid var(--border); border-radius: 14px;
+      padding: 22px; box-shadow: 0 4px 15px rgba(19, 43, 67, 0.03);
+    }
+    .stat-num { font-size: 32px; font-weight: 800; color: var(--primary); margin-top: 8px; }
+    .card {
+      background: white; border: 1px solid var(--border); border-radius: 14px;
+      padding: 24px; margin-top: 18px; box-shadow: 0 4px 15px rgba(19, 43, 67, 0.03);
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+    th {
+      background: #f7fafc; padding: 12px 14px; border-bottom: 2px solid var(--border);
+      color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase;
+    }
+    td { padding: 14px; border-bottom: 1px solid var(--border); }
+    tr:hover td { background: #fafcfe; }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge-admin { background: #e0f4f2; color: var(--primary-dark); }
+    .badge-user { background: #edf2f7; color: #4a5568; }
+    .badge-active { background: #e7f8ee; color: var(--success); }
+    .badge-inactive { background: #fff0e9; color: var(--danger); }
+    .btn-sm {
+      border: 1px solid var(--border); background: white; padding: 6px 12px;
+      border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 600;
+    }
+    .btn-sm:hover { background: #edf4f8; }
+    .message {
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;
+      font-size: 14px; font-weight: 600;
+    }
+    .message.success { background: #e7f8ee; color: #075b65; border: 1px solid #b7e4c7; }
+    .message.error { background: #fff0e9; color: #c92a2a; border: 1px solid #ffc9c9; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+      <a class="brand" href="/">✚ MediGuide AI <span style="font-size:14px; font-weight:600; color:var(--muted);">[ADMIN]</span></a>
+      <div class="nav-links">
+        <a href="/dashboard">User Dashboard</a>
+        <a href="/profile">Profile</a>
+        <a href="/">Public Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Administrator Oversight Portal</h1>
+    <p class="muted">System telemetry, platform access management, and security audit log review.</p>
+
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="message {{ category }}">{{ message }}</div>
+    {% endfor %}
+
+    <!-- KPI Statistics Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="muted">Total Registered Accounts</span>
+        <div class="stat-num">{{ total_users }}</div>
+      </div>
+      <div class="stat-card">
+        <span class="muted">Saved User Assessments</span>
+        <div class="stat-num">{{ total_assessments }}</div>
+      </div>
+      <div class="stat-card">
+        <span class="muted">Security Audit Events</span>
+        <div class="stat-num">{{ total_audits }}</div>
+      </div>
+    </div>
+
+    <!-- User Accounts Management Table -->
+    <h2>Registered Users ({{ users|length }})</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>#{{ u.id }}</td>
+            <td><strong>{{ u.name }}</strong></td>
+            <td>{{ u.email }}</td>
+            <td>
+              <span class="badge {% if u.role == 'admin' %}badge-admin{% else %}badge-user{% endif %}">
+                {{ u.role | upper }}
+              </span>
+            </td>
+            <td>
+              <span class="badge {% if u.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                {% if u.is_active %}ACTIVE{% else %}DEACTIVATED{% endif %}
+              </span>
+            </td>
+            <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>
+              {% if u.id != current_admin_id %}
+              <form method="POST" action="/admin/user/{{ u.id }}/toggle-status" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <button type="submit" class="btn-sm">
+                  {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                </button>
+              </form>
+              {% else %}
+              <span class="muted" style="font-size:12px;">(Current Admin)</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Security Audit Log Table -->
+    <h2>Recent Security Events (Last 20)</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp (UTC)</th>
+            <th>Event</th>
+            <th>User ID</th>
+            <th>IP Address</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in recent_audits %}
+          <tr>
+            <td style="white-space:nowrap;">{{ a.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td><strong>{{ a.event_type }}</strong></td>
+            <td>{% if a.user_id %}#{{ a.user_id }}{% else %}<span class="muted">Guest</span>{% endif %}</td>
+            <td>{{ a.ip_address or '—' }}</td>
+            <td>{{ a.details }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>
