@@ -1,11 +1,15 @@
-import os
-import pickle
+import logging
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
-import logging
 
 logger = logging.getLogger(__name__)
+
+# If the top class probability is below this, the ranking is treated as too weak
+# to present as a reliable assessment. Documented in /evaluation and docs/.
+WEAK_TOP_PROBABILITY = 0.15
+
 
 class SymptomMLService:
     def __init__(self, model_path=None):
@@ -19,25 +23,29 @@ class SymptomMLService:
 
     def _load_model(self):
         if not self.model_path.exists():
-            logger.error(f"Model file not found at {self.model_path}")
+            logger.error("Model file not found at %s", self.model_path)
             return
 
         try:
+            import pickle
+
             with open(self.model_path, "rb") as f:
                 saved = pickle.load(f)
 
             if isinstance(saved, dict):
                 self.model = saved.get("model")
-                self.symptoms = saved.get("features", [])
+                self.symptoms = list(saved.get("features", []))
             else:
-                self.model, self.symptoms = saved
-            
+                self.model, features = saved
+                self.symptoms = list(features)
+
             logger.info(
-                f"Symptom model successfully loaded. "
-                f"Total features: {len(self.symptoms)}, Classes: {len(self.model.classes_) if self.model else 0}"
+                "Symptom model loaded. Features: %s, Classes: %s",
+                len(self.symptoms),
+                len(self.model.classes_) if self.model is not None else 0,
             )
-        except Exception as e:
-            logger.error(f"Failed to load symptom model: {e}")
+        except Exception as exc:
+            logger.error("Failed to load symptom model: %s", exc)
             self.model = None
             self.symptoms = []
 
@@ -48,31 +56,45 @@ class SymptomMLService:
     def get_supported_symptoms(self):
         return list(self.symptoms)
 
+    def get_classes(self):
+        if not self.is_loaded:
+            return []
+        return [str(c) for c in self.model.classes_]
+
+    def build_feature_frame(self, chosen_symptoms):
+        """
+        Map selected symptom names onto the saved feature list, in the exact
+        saved order, as a one-row pandas DataFrame with those column names.
+        """
+        if not self.is_loaded:
+            raise RuntimeError("Symptom model is not available or failed to load.")
+
+        chosen_set = set(chosen_symptoms)
+        values = [1 if name in chosen_set else 0 for name in self.symptoms]
+        return pd.DataFrame([values], columns=self.symptoms)
+
+    def predict_proba_vector(self, chosen_symptoms):
+        frame = self.build_feature_frame(chosen_symptoms)
+        probabilities = self.model.predict_proba(frame)[0]
+        return frame, probabilities
+
     def predict(self, chosen_symptoms, top_k=3):
         if not self.is_loaded:
             raise RuntimeError("Symptom model is not available or failed to load.")
 
-        if not isinstance(chosen_symptoms, (list, set)) or len(chosen_symptoms) == 0:
+        if not isinstance(chosen_symptoms, (list, set, tuple)) or len(chosen_symptoms) == 0:
             raise ValueError("Please select at least one symptom.")
 
-        # Validate symptoms against supported list
-        invalid = [s for s in chosen_symptoms if s not in self.symptoms]
-        if invalid:
-            raise ValueError(f"Invalid symptom(s) provided: {', '.join(invalid[:5])}")
-
-        # Construct vector with exact feature names DataFrame to eliminate sklearn warnings
-        feature_vector = pd.DataFrame(
-            [[1 if s in chosen_symptoms else 0 for s in self.symptoms]],
-            columns=self.symptoms
-        )
-
-        probabilities = self.model.predict_proba(feature_vector)[0]
+        _frame, probabilities = self.predict_proba_vector(list(chosen_symptoms))
+        top_k = max(int(top_k), 1)
         top_indices = np.argsort(probabilities)[::-1][:top_k]
+        top_probability = float(np.max(probabilities))
 
         results = [
             {
                 "disease": str(self.model.classes_[i]),
-                "confidence": round(float(probabilities[i]) * 100, 1)
+                "confidence": round(float(probabilities[i]) * 100, 1),
+                "probability": float(probabilities[i]),
             }
             for i in top_indices
         ]
@@ -80,6 +102,9 @@ class SymptomMLService:
         return {
             "results": results,
             "selected_symptoms": list(chosen_symptoms),
+            "top_probability": top_probability,
+            "low_confidence": top_probability < WEAK_TOP_PROBABILITY,
+            "weak_threshold": WEAK_TOP_PROBABILITY,
             "urgency": (
                 "Model output is educational only. Seek medical advice. "
                 "For an emergency, contact local emergency services immediately."
@@ -87,8 +112,8 @@ class SymptomMLService:
             "disclaimer": (
                 "Not a diagnosis. Scores are statistical model estimates, "
                 "not clinically validated probabilities of disease."
-            )
+            ),
         }
 
-# Global singleton
+
 ml_service = SymptomMLService()

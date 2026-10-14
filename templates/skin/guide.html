@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skin Health Guide | MediGuide AI</title>
+  <style>
+    :root { --primary:#087e8b; --navy:#132b43; --muted:#637487; --background:#f5f9fb; --border:#e0eaf0; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,"Segoe UI",Arial,sans-serif; background:var(--background); color:var(--navy); line-height:1.6; }
+    header { background:#fff; border-bottom:1px solid var(--border); }
+    .container { width:min(900px,92%); margin:auto; }
+    .nav { min-height:72px; display:flex; justify-content:space-between; align-items:center; gap:16px; }
+    .brand { font-weight:800; color:var(--primary); text-decoration:none; }
+    nav a { color:#43566b; text-decoration:none; margin-left:14px; font-size:14px; }
+    main { padding:40px 0 70px; }
+    .card { background:#fff; border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:18px; }
+    h1 { margin:0 0 8px; }
+    .letter { display:inline-grid; place-items:center; width:36px; height:36px; border-radius:10px; background:var(--primary); color:#fff; font-weight:800; margin-right:10px; }
+    .abcde { display:flex; gap:12px; align-items:flex-start; margin:14px 0; }
+    .note { background:#fff6e5; border:1px solid #ffe0a3; border-radius:12px; padding:16px; }
+    footer { border-top:1px solid var(--border); padding:24px 0; color:var(--muted); font-size:13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/">✚ MediGuide AI</a>
+      <nav>
+        <a href="/#symptom-checker">Symptom Checker</a>
+        <a href="/doctors">Find care</a>
+        <a href="/conditions">Guides</a>
+        <a href="/evaluation">Evaluation</a>
+        <a href="/skin-health">Skin Health Guide</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <article class="card">
+      <h1>Skin Health Guide</h1>
+      <p>This page is educational. MediGuide AI does not analyse photographs and does not reuse the symptom model on images.</p>
+    </article>
+    <article class="card">
+      <h2>ABCDE criteria</h2>
+      <p>Public health services use these checks when looking at moles and spots. They are not a diagnosis.</p>
+      {% for item in abcde %}
+      <div class="abcde">
+        <span class="letter">{{ item.letter }}</span>
+        <div>
+          <strong>{{ item.feature }}</strong>
+          <div>{{ item.description }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </article>
+    <article class="card">
+      <h2>When to see a dermatologist</h2>
+      <ul>
+        {% for item in when_to_see %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+      <a href="/doctors?specialty=Dermatology">Find nearby clinics</a>
+    </article>
+    <p class="note">{{ future_scope }}</p>
+  </main>
+  <footer>
+    <div class="container">Educational information only — not a diagnosis. <a href="/disclaimer">Disclaimer</a></div>
+  </footer>
+</body>
+</html>

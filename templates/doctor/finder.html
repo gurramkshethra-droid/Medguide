@@ -131,7 +131,6 @@
               type="text"
               value="{{ location }}"
               placeholder="e.g. Hyderabad, London, New York, 500082"
-              required
             >
           </div>
           <div>
@@ -154,7 +153,7 @@
             <button type="submit" class="btn">Find Providers</button>
           </div>
           <div>
-            <button type="button" class="btn btn-outline" onclick="locateUser()">📍 Near Me</button>
+            <button type="button" class="btn btn-outline" onclick="locateUser()">Use my location</button>
           </div>
         </div>
       </form>
@@ -187,27 +186,40 @@
                   <span>📍</span> <span>{{ c.address }}</span>
                 </div>
                 <div class="clinic-meta">
-                  <span>🕒</span> <span>{{ c.opening_hours or 'Opening hours not published' }}</span>
+                  <span>🕒</span> <span>{{ c.opening_hours }}</span>
                 </div>
-                {% if c.phone %}
                 <div class="clinic-meta">
-                  <span>📞</span> <a href="tel:{{ c.phone }}" style="color:var(--primary); font-weight:600;">{{ c.phone }}</a>
+                  <span>📞</span>
+                  {% if c.phone != 'Not listed' %}
+                  <a href="tel:{{ c.phone }}" style="color:var(--primary); font-weight:600;">{{ c.phone }}</a>
+                  {% else %}
+                  <span>Not listed</span>
+                  {% endif %}
                 </div>
-                {% endif %}
+                <div class="clinic-meta">
+                  <span>🔗</span>
+                  {% if c.website != 'Not listed' %}
+                  <a href="{{ c.website }}" target="_blank" rel="noopener noreferrer">{{ c.website }}</a>
+                  {% else %}
+                  <span>Not listed</span>
+                  {% endif %}
+                </div>
               </div>
 
               <div class="card-actions">
-                <span style="font-size:12px; color:var(--muted);">
-                  {% if c.opening_hours %}Published Hours{% else %}Call to confirm{% endif %}
-                </span>
+                <span style="font-size:12px; color:var(--muted);">OpenStreetMap listing</span>
+                {% if c.directions_url %}
                 <a
                   class="directions-btn"
-                  href="https://www.google.com/maps/dir/?api=1&destination={{ c.lat }},{{ c.lon }}"
+                  href="{{ c.directions_url }}"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Get Directions ↗
+                  Google Maps directions ↗
                 </a>
+                {% else %}
+                <span>Not listed</span>
+                {% endif %}
               </div>
             </article>
             {% endfor %}
@@ -236,7 +248,7 @@
 
     <div class="attribution-box">
       <strong>Public Geodata Attribution & Clinical Safety Notice:</strong>
-      Healthcare facility listings, geocoordinates, and published attributes are provided by OpenStreetMap under the Open Database License (ODbL). MediGuide AI does not own or operate healthcare facilities and never invents physician names, credentials, or schedules. Published opening hours do not constitute confirmed appointment availability. In a medical emergency, immediately call local emergency services (911 / 112 / 999).
+      Map data (c) OpenStreetMap contributors. Listings come from public OpenStreetMap tags only. Missing name, type, address, phone, hours, or website fields are shown as Not listed — they are never invented. In an emergency call local emergency services.
     </div>
   </main>
 

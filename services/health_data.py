@@ -626,6 +626,51 @@ CONDITIONS_DATA = {
     }
 }
 
+PHARMACIST_NOTE = (
+    "Ask a pharmacist about over-the-counter options that may be suitable for you. "
+    "This guide does not name products or recommend doses."
+)
+
+_PRODUCT_HINT = re.compile(
+    r"(acetaminophen|paracetamol|ibuprofen|aspirin|albuterol|salbutamol|"
+    r"benzoyl|salicylic|clotrimazole|terbinafine|miconazole|antihistamine|"
+    r"antacid|h2 blocker|insulin|nsaid|mg\b|mcg\b)",
+    re.I,
+)
+
+
+def _homecare_steps(data):
+    steps = []
+    for item in data.get("self_care") or []:
+        if _PRODUCT_HINT.search(item):
+            continue
+        steps.append(item)
+    for item in data.get("prevention") or []:
+        if len(steps) >= 4:
+            break
+        if _PRODUCT_HINT.search(item):
+            continue
+        if item not in steps:
+            steps.append(item)
+    if not steps:
+        steps = [
+            "Rest if you feel unwell and drink fluids if you can keep them down.",
+            "Avoid known triggers and monitor for new warning signs.",
+        ]
+    return steps[:5]
+
+
+def _enrich(key, data):
+    enriched = dict(data)
+    enriched["model_key"] = key
+    enriched["homecare"] = _homecare_steps(data)
+    enriched["pharmacist_otc"] = PHARMACIST_NOTE
+    enriched["when_to_seek_care"] = list(data.get("warning_signs") or [])[:4] + [
+        f"See a clinician in {data.get('specialty', 'general practice')} if symptoms persist, worsen, or you are unsure."
+    ]
+    return enriched
+
+
 class HealthDataService:
     @staticmethod
     def get_all_conditions():
@@ -643,19 +688,28 @@ class HealthDataService:
 
     @staticmethod
     def get_condition_by_key(model_key):
-        """Retrieve condition by its exact model class key."""
-        return CONDITIONS_DATA.get(model_key)
+        """Retrieve condition by its model class key, ignoring trailing-space mismatches."""
+        if model_key in CONDITIONS_DATA:
+            return _enrich(model_key, CONDITIONS_DATA[model_key])
+        stripped = (model_key or "").strip()
+        if stripped in CONDITIONS_DATA:
+            return _enrich(stripped, CONDITIONS_DATA[stripped])
+        for key, data in CONDITIONS_DATA.items():
+            if key.strip() == stripped:
+                return _enrich(key, data)
+        return None
 
     @staticmethod
     def get_condition_by_slug(slug):
         """Retrieve condition by its URL slug."""
         for key, data in CONDITIONS_DATA.items():
             if data["slug"] == slug:
-                # Attach the original model key
-                res = dict(data)
-                res["model_key"] = key
-                return res
+                return _enrich(key, data)
         return None
+
+    @staticmethod
+    def model_slugs():
+        return {key: data["slug"] for key, data in CONDITIONS_DATA.items()}
 
     @staticmethod
     def search_conditions(query):

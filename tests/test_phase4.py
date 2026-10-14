@@ -95,7 +95,7 @@ def test_consent_setting_effect_on_predict(client, auth_user):
     client.post("/login", data={"email": "patient@example.com", "password": "SecurePass123!"})
 
     # auth_user starts with consent_save_history=True
-    r1 = client.post("/predict", data=json.dumps({"symptoms": ["itching", "skin_rash"]}), content_type="application/json")
+    r1 = client.post("/predict", data=json.dumps({"symptoms": ["itching", "skin_rash", "nodal_skin_eruptions"]}), content_type="application/json")
     assert r1.status_code == 200
 
     with client.application.app_context():
@@ -105,7 +105,7 @@ def test_consent_setting_effect_on_predict(client, auth_user):
     client.post("/profile", data={"action": "update_info", "name": "Test Patient"})
 
     # Check symptoms again with consent off
-    r2 = client.post("/predict", data=json.dumps({"symptoms": ["continuous_sneezing", "shivering"]}), content_type="application/json")
+    r2 = client.post("/predict", data=json.dumps({"symptoms": ["continuous_sneezing", "shivering", "chills"]}), content_type="application/json")
     assert r2.status_code == 200
 
     with client.application.app_context():
@@ -116,7 +116,7 @@ def test_consent_setting_effect_on_predict(client, auth_user):
 def test_history_view_and_single_delete(client, auth_user):
     """Test viewing and deleting single assessment from history."""
     client.post("/login", data={"email": "patient@example.com", "password": "SecurePass123!"})
-    client.post("/predict", data=json.dumps({"symptoms": ["itching", "skin_rash"]}), content_type="application/json")
+    client.post("/predict", data=json.dumps({"symptoms": ["itching", "skin_rash", "nodal_skin_eruptions"]}), content_type="application/json")
 
     # View history
     history_res = client.get("/history")
@@ -141,7 +141,7 @@ def test_cross_user_assessment_delete_forbidden(client, auth_user, second_user):
     """SECURITY TEST: User B must not delete User A's assessment (403 Forbidden)."""
     # Create assessment for User A (auth_user)
     client.post("/login", data={"email": "patient@example.com", "password": "SecurePass123!"})
-    client.post("/predict", data=json.dumps({"symptoms": ["itching", "skin_rash"]}), content_type="application/json")
+    client.post("/predict", data=json.dumps({"symptoms": ["itching", "skin_rash", "nodal_skin_eruptions"]}), content_type="application/json")
     client.post("/logout")
 
     with client.application.app_context():
@@ -167,12 +167,12 @@ def test_history_clear_all_isolation(client, auth_user, second_user):
     """Test clear-all deletes only the requesting user's records."""
     # User A assessment
     client.post("/login", data={"email": "patient@example.com", "password": "SecurePass123!"})
-    client.post("/predict", data=json.dumps({"symptoms": ["itching", "skin_rash"]}), content_type="application/json")
+    client.post("/predict", data=json.dumps({"symptoms": ["itching", "skin_rash", "nodal_skin_eruptions"]}), content_type="application/json")
     client.post("/logout")
 
     # User B assessment
     client.post("/login", data={"email": "second@example.com", "password": "SecondPass123!"})
-    client.post("/predict", data=json.dumps({"symptoms": ["continuous_sneezing"]}), content_type="application/json")
+    client.post("/predict", data=json.dumps({"symptoms": ["continuous_sneezing", "shivering", "chills"]}), content_type="application/json")
 
     # User B clears all history
     client.post("/history/clear-all", follow_redirects=True)

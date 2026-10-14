@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_wtf.csrf import generate_csrf
+from dotenv import load_dotenv
 
 from config import config_by_name
 from extensions import db, csrf, limiter
@@ -9,7 +10,13 @@ from routes.main import main_bp
 from routes.symptom import symptom_bp
 from routes.errors import errors_bp
 from routes.admin import admin_bp
+from routes.conditions import conditions_bp
+from routes.doctor import doctor_bp
+from routes.skin import skin_bp
+from routes.evaluation import evaluation_bp
 import click
+
+load_dotenv()
 
 def create_app(config_name=None):
     if config_name is None:
@@ -31,16 +38,21 @@ def create_app(config_name=None):
     app.register_blueprint(symptom_bp)
     app.register_blueprint(errors_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(conditions_bp)
+    app.register_blueprint(doctor_bp)
+    app.register_blueprint(skin_bp)
+    app.register_blueprint(evaluation_bp)
 
     # Context processor for CSRF token string compatibility across all templates
     @app.context_processor
     def inject_csrf_token():
         return {"csrf_token": generate_csrf()}
 
-    # Initialize database tables
+    # Attach SQLAlchemy models to the configured database without dropping records
     with app.app_context():
         import models  # Ensure all models are imported before create_all
         db.create_all()
+        app.logger.info("Database attached: %s", app.config.get("SQLALCHEMY_DATABASE_URI"))
 
     # CLI Command to securely bootstrap the initial administrator
     @app.cli.command("create-admin")
@@ -75,3 +87,5 @@ if __name__ == "__main__":
         debug=False,
         use_reloader=False
     )
+
+

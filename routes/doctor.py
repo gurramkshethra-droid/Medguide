@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 from services.doctor_service import doctor_service
-from extensions import limiter
+from extensions import limiter, csrf
 
 doctor_bp = Blueprint("doctor", __name__)
 
@@ -8,7 +8,7 @@ doctor_bp = Blueprint("doctor", __name__)
 def doctor_finder_page():
     location = request.args.get("location", "").strip()
     specialty = request.args.get("specialty", "").strip()
-    
+
     results_data = None
     if location:
         results_data = doctor_service.find_doctors(location_text=location, specialty=specialty)
@@ -21,6 +21,7 @@ def doctor_finder_page():
     )
 
 @doctor_bp.route("/api/doctors/search", methods=["POST"])
+@csrf.exempt
 @limiter.limit("20 per minute")
 def api_search_doctors():
     data = request.get_json(silent=True) or {}

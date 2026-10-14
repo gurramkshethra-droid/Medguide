@@ -15,3 +15,7 @@ instance/
 logs/
 *.log
 
+
+# Local project backups
+backup_20261014_0045/
+backup_20261014_0100/

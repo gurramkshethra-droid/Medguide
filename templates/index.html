@@ -96,9 +96,11 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 25px;
+      gap: 18px;
       font-size: 14px;
       color: #43566b;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .nav-links a:hover {
@@ -427,10 +429,132 @@
       font-size: 13px;
     }
 
+    .context-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 8px 0 16px;
+    }
+
+    .context-grid label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .context-grid select,
+    .context-grid input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cedce5;
+      border-radius: 10px;
+      background: white;
+      outline-color: var(--primary);
+    }
+
+    .history-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .history-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .history-options label:has(input:checked) {
+      border-color: var(--primary);
+      background: #eef9f8;
+    }
+
+    .assessment {
+      text-align: left;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #f8fbfc;
+    }
+
+    .assessment-hero {
+      padding: 22px 22px 16px;
+      background: linear-gradient(135deg, #e7f6f4, #ffffff);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .assessment-hero h3 {
+      margin: 6px 0 8px;
+      font-size: 26px;
+      letter-spacing: -0.6px;
+    }
+
+    .assessment-kicker {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .safety-banner {
+      margin: 16px 22px 0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+    }
+
+    .safety-banner.emergency { background: #fff1f1; border-left: 5px solid #d90429; color: #9b1c1c; }
+    .safety-banner.urgent { background: #fff6e8; border-left: 5px solid #e8590c; color: #9c4a00; }
+    .safety-banner.routine { background: #eaf8f0; border-left: 5px solid #2b8a3e; color: #215c32; }
+
+    .assessment-body { padding: 8px 22px 22px; }
+
+    .explain-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .match-pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 3px 8px;
+      background: #e7f3f4;
+      color: var(--primary-dark);
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .guide-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .guide-box h4, .assessment-body h4 { margin: 16px 0 8px; }
+
     .steps {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 22px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
     }
 
     .step {
@@ -546,7 +670,7 @@
         padding: 9px 10px;
       }
 
-      .features, .steps, .symptoms {
+      .features, .steps, .symptoms, .context-grid, .guide-grid {
         grid-template-columns: 1fr;
       }
 
@@ -582,6 +706,10 @@
       <a href="#features">Features</a>
       <a class="optional" href="#how-it-works">How it works</a>
       <a href="#symptom-checker">Symptom Checker</a>
+      <a href="/doctors">Find care</a>
+      <a href="/conditions">Guides</a>
+      <a href="/skin-health">Skin Health Guide</a>
+      <a href="/evaluation">Evaluation</a>
       {% if session.get("user_id") %}
       <a href="/dashboard">My Dashboard</a>
       <form action="/logout" method="POST" style="display:inline;margin:0">
@@ -659,8 +787,8 @@
         <div class="health-card">
           <div class="health-icon">▧</div>
           <div>
-            <strong>Skin Photo Analysis</strong>
-            <small>Planned feature for supported skin images</small>
+            <strong>Skin Health Guide</strong>
+            <small>ABCDE checks and when to see a dermatologist</small>
           </div>
         </div>
 
@@ -688,10 +816,10 @@
       <div class="features">
         <article class="feature">
           <div class="feature-icon">♡</div>
-          <h3>AI Symptom Checker</h3>
+          <h3>Better symptom checker</h3>
           <p>
-            Select symptoms and explore the possible conditions suggested
-            by our educational machine-learning model.
+            Symptoms are mapped to training profiles and clinical rules first,
+            so common complaints are not ranked as unrelated emergencies.
           </p>
           <a class="feature-link" href="#symptom-checker">
             Try symptom checker →
@@ -700,66 +828,61 @@
 
         <article class="feature">
           <div class="feature-icon">▧</div>
-          <span class="tag">Planned feature</span>
-          <h3>Skin Photo Analysis</h3>
+          <h3>Skin Health Guide</h3>
           <p>
-            A future image-analysis tool for a defined set of skin conditions,
-            with clear limitations and guidance on professional evaluation.
+            ABCDE mole checks and advice on when to see a dermatologist.
+            Photo analysis is future scope and is not available in this project.
           </p>
-          <a class="feature-link" href="#skin-feature">
-            Explore the feature →
+          <a class="feature-link" href="/skin-health">
+            Open skin health guide →
           </a>
         </article>
 
         <article class="feature">
           <div class="feature-icon">⌖</div>
-          <span class="tag">Planned feature</span>
-          <h3>Find Nearby Doctors</h3>
+          <h3>Find nearby care</h3>
           <p>
-            Find healthcare providers by location, specialty and available
-            clinic information once the directory integration is configured.
+            Search hospitals and clinics by location using live OpenStreetMap
+            data. Fields that are missing are shown as Not listed.
           </p>
-          <a class="feature-link" href="#doctor-feature">
-            Explore the feature →
+          <a class="feature-link" href="/doctors">
+            Find healthcare →
           </a>
         </article>
 
         <article class="feature">
           <div class="feature-icon">✚</div>
-          <span class="tag">Planned feature</span>
-          <h3>Health Guidance</h3>
+          <h3>Reviewed health guidance</h3>
           <p>
-            Access reviewed educational information about common causes,
-            prevention, self-care and warning signs.
+            Read educational information about possible explanations,
+            self-care, warning signs and suggested next steps.
           </p>
-          <a class="feature-link" href="#how-it-works">
-            Learn how it works →
+          <a class="feature-link" href="/conditions">
+            Browse condition guides →
           </a>
         </article>
 
         <article class="feature">
           <div class="feature-icon">▤</div>
-          <span class="tag">Planned feature</span>
           <h3>Personal Dashboard</h3>
           <p>
-            A future account area for profile settings and optional,
-            user-authorized assessment history.
+            Signed-in users can review optional assessment history and
+            privacy settings from their dashboard.
           </p>
-          <a class="feature-link" href="#account-feature">
-            Explore the feature →
+          <a class="feature-link" href="/dashboard">
+            Open dashboard →
           </a>
         </article>
 
         <article class="feature">
           <div class="feature-icon">♧</div>
-          <span class="tag">Planned feature</span>
-          <h3>Secure User Accounts</h3>
+          <h3>Secure user accounts</h3>
           <p>
-            Email and password registration, login, logout and protected
-            personal pages will be added in the next development stage.
+            Register with email and password. Assessment history is saved
+            only when you give explicit consent.
           </p>
-          <a class="feature-link" href="#account-feature">
-            Learn more →
+          <a class="feature-link" href="/register">
+            Create an account →
           </a>
         </article>
       </div>
@@ -771,9 +894,52 @@
       <div class="checker">
         <h2>Let's explore your symptoms</h2>
         <p class="muted">
-          Select the symptoms you want to explore. The model will return
-          its top predictions for educational purposes.
+          Select multiple symptoms, then add duration, severity, age group,
+          and relevant history. Warning signs are checked before ordinary guidance.
         </p>
+
+        <div class="context-grid">
+          <div>
+            <label for="duration">Duration</label>
+            <select id="duration">
+              {% for key, label in duration_choices.items() %}
+              <option value="{{ key }}" {% if key == "1_to_3_days" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="severity">Severity</label>
+            <select id="severity">
+              {% for key, label in severity_choices.items() %}
+              <option value="{{ key }}" {% if key == "moderate" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="ageGroup">Age group</label>
+            <select id="ageGroup">
+              {% for key, label in age_choices.items() %}
+              <option value="{{ key }}" {% if key == "adult" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label for="careLocation">Your city or area (optional)</label>
+            <input id="careLocation" type="text" placeholder="e.g. Hyderabad, London">
+          </div>
+        </div>
+
+        <label style="font-size:12px;font-weight:700;">Relevant medical history</label>
+        <div class="history-options" id="historyOptions">
+          {% for key, label in history_choices.items() %}
+            {% if key != "none" %}
+            <label>
+              <input type="checkbox" value="{{ key }}">
+              <span>{{ label }}</span>
+            </label>
+            {% endif %}
+          {% endfor %}
+        </div>
 
         <input
           id="search"
@@ -821,27 +987,35 @@
   <section class="section" id="how-it-works">
     <div class="container">
       <div class="section-heading">
-        <h2>Simple to get started</h2>
-        <p>Three simple steps to explore the current symptom checker.</p>
+        <h2>How the complete system works</h2>
+        <p>From symptoms to safer guidance and nearby care.</p>
       </div>
 
       <div class="steps">
         <div class="step">
           <div class="step-number">1</div>
-          <h3>Select symptoms</h3>
-          <p>Choose the symptoms you want to explore from the available list.</p>
+          <h3>Enter symptoms</h3>
+          <p>Select symptoms plus duration, severity, age group, and history.</p>
         </div>
-
         <div class="step">
           <div class="step-number">2</div>
-          <h3>View model output</h3>
-          <p>See the conditions suggested by the trained model.</p>
+          <h3>Safety check</h3>
+          <p>Warning signs are assessed before ordinary guidance is shown.</p>
         </div>
-
         <div class="step">
           <div class="step-number">3</div>
-          <h3>Seek appropriate care</h3>
-          <p>Use reliable health information and consult a qualified clinician.</p>
+          <h3>Analysis engine</h3>
+          <p>Clinical rules, reviewed information, and evaluated ML scores are combined.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <h3>Personalized guidance</h3>
+          <p>See possible explanations, uncertainty, self-care, and next steps.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">5</div>
+          <h3>Find care</h3>
+          <p>Open nearby hospitals, clinics, and matching specialties.</p>
         </div>
       </div>
     </div>
@@ -850,13 +1024,13 @@
   <section class="container" id="skin-feature">
     <div class="cta">
       <div>
-        <h2>Skin Photo Analysis</h2>
+        <h2>Skin Health Guide</h2>
         <p>
-          Image upload and model-based analysis are planned for a future
-          version. This feature is not yet available.
+          Review ABCDE mole checks and when to see a dermatologist.
+          Photo analysis is future scope and is not available here.
         </p>
       </div>
-      <span class="tag">Coming in a future version</span>
+      <a class="button" href="/skin-health">Open skin health guide</a>
     </div>
   </section>
 
@@ -865,11 +1039,11 @@
       <div>
         <h2>Find Healthcare Providers</h2>
         <p>
-          A doctor directory with specialties, clinic locations and
-          published opening hours will be added after integration.
+          Search real hospitals and clinics by city or area, then filter
+          by specialty suggested from your assessment.
         </p>
       </div>
-      <span class="tag">Coming in a future version</span>
+      <a class="button" href="/doctors">Find nearby care</a>
     </div>
   </section>
 
@@ -878,11 +1052,11 @@
       <div>
         <h2>Your account, your control</h2>
         <p>
-          Secure email registration and login will be developed next.
-          No account is required for this prototype.
+          Create an account to optionally save assessments. Guests can still
+          use the symptom checker without storing history.
         </p>
       </div>
-      <span class="tag">Authentication not enabled yet</span>
+      <a class="button button-outline" href="/register">Create account</a>
     </div>
   </section>
 </main>
@@ -891,10 +1065,14 @@
   <div class="container footer-inner">
     <div>
       <strong>MediGuide AI</strong>
-      <div>Smart healthcare information for informed choices.</div>
+      <div>Educational health information. Not a diagnosis or treatment.</div>
     </div>
     <div>
-      Educational prototype · Not for diagnosis or treatment
+      <a href="/about">About</a> ·
+      <a href="/privacy">Privacy</a> ·
+      <a href="/disclaimer">Disclaimer</a> ·
+      <a href="/evaluation">Evaluation</a> ·
+      <a href="/doctors">Find care</a>
     </div>
   </div>
 </footer>
@@ -902,6 +1080,8 @@
 <script>
   const output = document.getElementById("output");
   const button = document.getElementById("predictButton");
+  const CSRF_TOKEN = "{{ csrf_token }}";
+  let lastPayload = null;
 
   document.getElementById("search").addEventListener("input", function () {
     const query = this.value.toLowerCase().trim();
@@ -916,30 +1096,282 @@
     document.querySelectorAll(
       '#symptomList input[type="checkbox"]'
     ).forEach(item => item.checked = false);
-
+    document.querySelectorAll(
+      '#historyOptions input[type="checkbox"]'
+    ).forEach(item => item.checked = false);
     output.replaceChildren();
   }
 
-  async function predict() {
+  function listItems(items) {
+    const ul = document.createElement("ul");
+    ul.style.margin = "0";
+    ul.style.paddingLeft = "18px";
+    (items || []).forEach(text => {
+      const li = document.createElement("li");
+      li.textContent = text;
+      ul.appendChild(li);
+    });
+    return ul;
+  }
+
+  function renderAssessment(data) {
+    output.replaceChildren();
+    const wrap = document.createElement("div");
+    wrap.className = "assessment";
+
+    const hero = document.createElement("div");
+    hero.className = "assessment-hero";
+    hero.innerHTML = "<div class='assessment-kicker'>MediGuide AI</div>";
+    const title = document.createElement("h3");
+    title.textContent = "Your Symptom Assessment";
+    const note = document.createElement("p");
+    note.className = "muted";
+    note.style.margin = "0";
+    note.textContent = "Illustrative interface example — not an actual medical prediction.";
+    hero.append(title, note);
+    wrap.appendChild(hero);
+
+    const safety = data.safety || {};
+    const banner = document.createElement("div");
+    banner.className = "safety-banner " + (safety.level || "routine");
+    const bannerTitle = document.createElement("strong");
+    bannerTitle.textContent = safety.label || "Safety check";
+    banner.appendChild(bannerTitle);
+    const bannerText = document.createElement("div");
+    bannerText.style.marginTop = "6px";
+    bannerText.textContent = data.emergency_alert || safety.summary || data.urgency || "";
+    banner.appendChild(bannerText);
+    wrap.appendChild(banner);
+
+    const body = document.createElement("div");
+    body.className = "assessment-body";
+
+    const ctx = data.context || {};
+    const meta = document.createElement("p");
+    meta.className = "muted";
+    meta.style.fontSize = "13px";
+    meta.textContent = [
+      "Duration: " + (ctx.duration || "—"),
+      "Severity: " + (ctx.severity || "—"),
+      "Age: " + (ctx.age_group || "—"),
+      "History: " + ((ctx.history || []).join(", ") || "None reported")
+    ].join(" · ");
+    body.appendChild(meta);
+
+    if (data.needs_more_symptoms) {
+      const more = document.createElement("p");
+      more.innerHTML = "<strong>Add more symptoms</strong>";
+      const moreText = document.createElement("p");
+      moreText.textContent = data.message || "Select at least 3 symptoms before an educational ranking can be shown.";
+      body.appendChild(more);
+      body.appendChild(moreText);
+    } else if (data.low_confidence) {
+      const weak = document.createElement("p");
+      weak.innerHTML = "<strong>Not enough information to assess reliably.</strong>";
+      const weakText = document.createElement("p");
+      weakText.textContent = "Further medical assessment or testing may be appropriate. Serious conditions are not ruled out.";
+      body.appendChild(weak);
+      body.appendChild(weakText);
+    }
+
+    const expHeading = document.createElement("h4");
+    expHeading.textContent = "Possible explanations";
+    body.appendChild(expHeading);
+
+    (data.results || []).forEach((item, index) => {
+      const card = document.createElement("div");
+      card.className = "explain-card";
+      const name = document.createElement("strong");
+      name.textContent = (index + 1) + ". " + (item.title || item.disease);
+      const pill = document.createElement("span");
+      pill.className = "match-pill";
+      pill.style.marginLeft = "8px";
+      pill.textContent = (item.match_quality || "limited") + " match";
+      const score = document.createElement("div");
+      score.className = "muted";
+      score.style.fontSize = "13px";
+      score.style.margin = "6px 0";
+      score.textContent = "Model support (not a validated probability): " + item.confidence + "% · " + (item.specialty || "General Practice");
+      const desc = document.createElement("p");
+      desc.style.margin = "0";
+      desc.style.fontSize = "14px";
+      desc.textContent = item.description || "";
+      card.append(name, pill, score, desc);
+      const matched = document.createElement("p");
+      matched.style.fontSize = "13px";
+      matched.textContent = "Symptoms you reported that match: " + ((item.matched_symptoms || []).join(", ") || "None listed");
+      const missing = document.createElement("p");
+      missing.style.fontSize = "13px";
+      missing.textContent = "Typical symptoms you did not report: " + ((item.unreported_typical_symptoms || []).join(", ") || "None listed");
+      card.append(matched, missing);
+      if (item.slug) {
+        const guideLink = document.createElement("a");
+        guideLink.href = "/conditions/" + encodeURIComponent(item.slug);
+        guideLink.style.cssText = "display:inline-block;margin-top:8px;color:#087e8b;font-weight:700;font-size:13px;";
+        guideLink.textContent = "Read reviewed health information →";
+        card.appendChild(guideLink);
+      }
+      body.appendChild(card);
+    });
+
+    const guidance = data.guidance || {};
+    const grid = document.createElement("div");
+    grid.className = "guide-grid";
+
+    const uncertainty = document.createElement("div");
+    uncertainty.className = "guide-box";
+    uncertainty.innerHTML = "<h4 style='margin-top:0'>Uncertainty</h4>";
+    uncertainty.appendChild(listItems(guidance.uncertainty));
+
+    const selfCare = document.createElement("div");
+    selfCare.className = "guide-box";
+    selfCare.innerHTML = "<h4 style='margin-top:0'>Self-care</h4>";
+    selfCare.appendChild(listItems(guidance.self_care));
+    grid.append(uncertainty, selfCare);
+    body.appendChild(grid);
+
+    const warnings = document.createElement("div");
+    warnings.className = "guide-box";
+    warnings.style.marginTop = "12px";
+    warnings.innerHTML = "<h4 style='margin-top:0'>Warning signs</h4>";
+    warnings.appendChild(listItems(guidance.warning_signs));
+    body.appendChild(warnings);
+
+    const next = document.createElement("div");
+    next.className = "guide-box";
+    next.style.marginTop = "12px";
+    next.innerHTML = "<h4 style='margin-top:0'>Recommended next steps</h4>";
+    next.appendChild(listItems(guidance.next_steps));
+    body.appendChild(next);
+
+    const specialty = encodeURIComponent(guidance.recommended_specialty || "");
+    const location = encodeURIComponent(data.location || document.getElementById("careLocation").value || "");
+    const care = document.createElement("a");
+    care.className = "button";
+    care.style.marginTop = "16px";
+    care.href = "/doctors?specialty=" + specialty + (location ? "&location=" + location : "");
+    care.textContent = "Find appropriate healthcare →";
+    body.appendChild(care);
+
+    const disclaimer = document.createElement("p");
+    disclaimer.className = "muted";
+    disclaimer.style.fontSize = "12px";
+    disclaimer.textContent = data.disclaimer || "";
+    body.appendChild(disclaimer);
+
+    if (data.ranking_change && data.ranking_change.changed) {
+      const changeBox = document.createElement("div");
+      changeBox.className = "guide-box";
+      changeBox.style.marginTop = "12px";
+      const prev = (data.ranking_change.previous || []).join(", ") || "none";
+      const curr = (data.ranking_change.current || []).join(", ") || "none";
+      changeBox.textContent = "Ranking after follow-up: " + curr + " (was " + prev + ")";
+      body.appendChild(changeBox);
+    }
+
+    const questions = data.followup_questions || [];
+    if (questions.length && !data.needs_more_symptoms) {
+      const qBox = document.createElement("div");
+      qBox.className = "guide-box";
+      qBox.style.marginTop = "12px";
+      const qTitle = document.createElement("h4");
+      qTitle.style.marginTop = "0";
+      qTitle.textContent = "A few follow-up questions";
+      qBox.appendChild(qTitle);
+      questions.forEach((q, index) => {
+        const row = document.createElement("div");
+        row.style.margin = "8px 0";
+        const lab = document.createElement("div");
+        lab.textContent = (index + 1) + ". " + q.question;
+        const yes = document.createElement("label");
+        yes.style.marginRight = "12px";
+        yes.innerHTML = "<input type='radio' name='fu_" + index + "' value='yes'> Yes";
+        yes.querySelector("input").dataset.symptom = q.symptom;
+        const no = document.createElement("label");
+        no.innerHTML = "<input type='radio' name='fu_" + index + "' value='no'> No";
+        no.querySelector("input").dataset.symptom = q.symptom;
+        row.append(lab, yes, no);
+        qBox.appendChild(row);
+      });
+      const qBtn = document.createElement("button");
+      qBtn.className = "button";
+      qBtn.type = "button";
+      qBtn.textContent = "Update assessment";
+      qBtn.addEventListener("click", submitFollowup);
+      qBox.appendChild(qBtn);
+      body.appendChild(qBox);
+    }
+
+    wrap.appendChild(body);
+    output.appendChild(wrap);
+    wrap.scrollIntoView({behavior: "smooth", block: "start"});
+  }
+
+  function currentFormPayload() {
     const chosen = Array.from(
-      document.querySelectorAll(
-        '#symptomList input[type="checkbox"]:checked'
-      )
+      document.querySelectorAll('#symptomList input[type="checkbox"]:checked')
     ).map(item => item.value);
+    const history = Array.from(
+      document.querySelectorAll('#historyOptions input[type="checkbox"]:checked')
+    ).map(item => item.value);
+    return {
+      symptoms: chosen,
+      duration: document.getElementById("duration").value,
+      severity: document.getElementById("severity").value,
+      age_group: document.getElementById("ageGroup").value,
+      history: history,
+      location: document.getElementById("careLocation").value
+    };
+  }
+
+  async function submitFollowup() {
+    if (!lastPayload) return;
+    const answers = {};
+    document.querySelectorAll("[name^='fu_']:checked").forEach(input => {
+      answers[input.dataset.symptom] = input.value;
+    });
+    if (!Object.keys(answers).length) {
+      return;
+    }
+    button.disabled = true;
+    try {
+      const response = await fetch("/predict/follow-up", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", "X-CSRFToken": CSRF_TOKEN},
+        body: JSON.stringify(Object.assign({}, lastPayload, {answers: answers}))
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        output.textContent = data.error || "Unable to process follow-up answers.";
+        return;
+      }
+      lastPayload.symptoms = data.selected_symptoms;
+      renderAssessment(data);
+    } catch (error) {
+      output.textContent = "Could not update the assessment. Please try again.";
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function predict() {
+    const payload = currentFormPayload();
+    const chosen = payload.symptoms;
 
     if (chosen.length === 0) {
       output.textContent = "Please select at least one symptom.";
       return;
     }
 
+    lastPayload = payload;
     button.disabled = true;
-    output.textContent = "Processing your selection...";
+    output.textContent = "Checking warning signs and mapping symptoms...";
 
     try {
       const response = await fetch("/predict", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({symptoms: chosen})
+        headers: {"Content-Type": "application/json", "X-CSRFToken": CSRF_TOKEN},
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
@@ -949,56 +1381,8 @@
         return;
       }
 
-      output.replaceChildren();
-
-      if (data.emergency_alert) {
-        const emergencyBox = document.createElement("div");
-        emergencyBox.style.cssText = "background:#fff5f5; border:1px solid #ffc9c9; border-left:6px solid #d90429; border-radius:10px; padding:16px; margin-bottom:16px; color:#c92a2a; font-weight:600; font-size:14px; text-align:left;";
-        emergencyBox.textContent = data.emergency_alert;
-        output.appendChild(emergencyBox);
-      }
-
-      const heading = document.createElement("h3");
-      heading.textContent = "Model Predictions";
-      output.appendChild(heading);
-
-      data.results.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "result-card";
-        card.style.textAlign = "left";
-
-        const name = document.createElement("strong");
-        name.style.display = "block";
-        name.style.fontSize = "16px";
-        name.textContent = item.title || item.disease;
-
-        const score = document.createElement("div");
-        score.className = "muted";
-        score.style.fontSize = "13px";
-        score.style.margin = "4px 0";
-        score.textContent = "Model score: " + item.confidence + "%";
-
-        card.append(name, score);
-
-        if (item.slug) {
-          const guideLink = document.createElement("a");
-          guideLink.href = "/conditions/" + encodeURIComponent(item.slug);
-          guideLink.style.cssText = "display:inline-block; margin-top:6px; color:#087e8b; font-weight:700; font-size:13px;";
-          guideLink.textContent = "View Condition Guide & Self-Care →";
-          card.appendChild(guideLink);
-        }
-
-        output.appendChild(card);
-      });
-
-      const urgency = document.createElement("p");
-      urgency.textContent = data.urgency;
-      output.appendChild(urgency);
-
-      const disclaimer = document.createElement("p");
-      disclaimer.className = "muted";
-      disclaimer.textContent = data.disclaimer;
-      output.appendChild(disclaimer);
+      lastPayload.symptoms = data.selected_symptoms || payload.symptoms;
+      renderAssessment(data);
 
     } catch (error) {
       output.textContent = "Could not connect to the healthcare service. Please check your network and try again.";

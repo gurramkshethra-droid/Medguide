@@ -137,17 +137,24 @@
         {% endfor %}
       </ul>
 
-      <h2>Evidence-Based Self-Care Measures</h2>
+      <h2>Home care</h2>
       <ul>
-        {% for sc in condition.self_care %}
+        {% for sc in condition.homecare %}
           <li>{{ sc }}</li>
         {% endfor %}
       </ul>
+      <p><strong>{{ condition.pharmacist_otc }}</strong></p>
 
-      <h2 style="color:var(--danger);">⚠️ Warning Signs — When to Seek Immediate Medical Help</h2>
+      <h2 style="color:var(--danger);">Warning signs</h2>
       <ul>
         {% for ws in condition.warning_signs %}
           <li style="color:#b00320;"><strong>{{ ws }}</strong></li>
+        {% endfor %}
+      </ul>
+      <h2>When to seek care</h2>
+      <ul>
+        {% for item in condition.when_to_seek_care %}
+          <li>{{ item }}</li>
         {% endfor %}
       </ul>
 

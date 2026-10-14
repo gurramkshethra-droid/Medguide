@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model Evaluation | MediGuide AI</title>
+  <style>
+    :root { --primary:#087e8b; --navy:#132b43; --muted:#637487; --background:#f5f9fb; --border:#e0eaf0; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,"Segoe UI",Arial,sans-serif; background:var(--background); color:var(--navy); }
+    header { background:#fff; border-bottom:1px solid var(--border); }
+    .container { width:min(960px,92%); margin:auto; }
+    .nav { min-height:72px; display:flex; justify-content:space-between; align-items:center; }
+    .brand { font-weight:800; color:var(--primary); text-decoration:none; }
+    nav a { color:#43566b; text-decoration:none; margin-left:14px; font-size:14px; }
+    main { padding:40px 0 70px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+    .stat { background:#fff; border:1px solid var(--border); border-radius:14px; padding:16px; }
+    .stat strong { display:block; font-size:22px; }
+    img { max-width:100%; border:1px solid var(--border); border-radius:12px; background:#fff; }
+    .card { background:#fff; border:1px solid var(--border); border-radius:16px; padding:22px; margin:18px 0; }
+    li { margin-bottom:8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/">✚ MediGuide AI</a>
+      <nav>
+        <a href="/#symptom-checker">Symptom Checker</a>
+        <a href="/doctors">Find care</a>
+        <a href="/conditions">Guides</a>
+        <a href="/evaluation">Evaluation</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <h1>Model evaluation</h1>
+    <p>Numbers below were computed from <code>Training.csv</code> and the saved <code>model.pkl</code>. The pickle file was not retrained.</p>
+    <div class="grid">
+      <div class="stat"><span>Test accuracy</span><strong>{{ '%.2f'|format(metrics.test_accuracy * 100) }}%</strong></div>
+      <div class="stat"><span>Top-3 accuracy</span><strong>{{ '%.2f'|format(metrics.top3_accuracy * 100) }}%</strong></div>
+      <div class="stat"><span>5-fold cross-validation</span><strong>{{ '%.2f'|format(metrics.cv_accuracy_mean * 100) }}%</strong><small>± {{ '%.2f'|format(metrics.cv_accuracy_std * 100) }}</small></div>
+      <div class="stat"><span>Robustness top-3 (drop 1–2 symptoms)</span><strong>{{ '%.2f'|format(metrics.robustness_drop_1_or_2_top3_accuracy * 100) }}%</strong></div>
+    </div>
+    <div class="card">
+      <h2>Dataset used for these numbers</h2>
+      <p>{{ metrics.n_rows }} rows · {{ metrics.n_features }} features · {{ metrics.n_classes }} classes · {{ metrics.n_duplicate_rows }} duplicate rows · holdout size {{ metrics.test_size }} · model type {{ metrics.model_type }}</p>
+      <p>Fold scores: {{ metrics.cv_scores | join(', ') }}</p>
+    </div>
+    <div class="card">
+      <h2>Confusion matrix</h2>
+      <p>Holdout split of Training.csv. Image generated at request time.</p>
+      <img src="{{ metrics.confusion_matrix_image }}" alt="Confusion matrix of holdout predictions">
+    </div>
+    <div class="card">
+      <h2>Limitations</h2>
+      <ul>
+        {% for item in metrics.limitations %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </main>
+</body>
+</html>
